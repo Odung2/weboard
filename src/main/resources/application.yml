@@ -1,0 +1,33 @@
+# port
+server:
+  port: 8080
+# logging level
+#logging:
+#  level:
+#    root: debug
+#  config: classpath:log4j/log4j2.xml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:log4jdbc:mysql://localhost:3306/weboard
+    username: mingle
+    password: mingle
+    hikari:
+      pool-name: hikari-cp
+      maximum-pool-size: 5
+      connection-timeout: 7000
+      connection-init-sql: SELECT 1
+      validation-timeout: 7000
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 1800000
+#mybatis config
+mybatis:
+  configuration:
+    multiple-result-sets-enabled: false
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: true
+    jdbc-type-for-null: varchar
+    default-fetch-size: 500
+  type-aliases-package: com.example.weboard
+  mapper-locations: classpath:mapper/**/*.xml
