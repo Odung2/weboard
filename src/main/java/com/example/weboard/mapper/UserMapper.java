@@ -1,6 +1,6 @@
 package com.example.weboard.mapper;
 
-import org.apache.catalina.User;
+import com.example.weboard.model.User;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

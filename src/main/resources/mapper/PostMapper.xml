@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.weboard.mapper.PostMapper">
+    <select id="getPostById" parameterType="int" resultType="com.example.weboard.model.Post">
+        SELECT * FROM post WHERE post_id=#{postId}
+    </select>
+
+    <insert id="insertPost" parameterType="com.example.weboard.model.Post">
+        INSERT INTO post (title, created_by, updated_by, updated_at, views, content_text, file_data)
+        VALUES (#{title}, #{createdBy}, null, null, #{views}, #{contentText}, #{fileData});
+    </insert>
+
+    <update id="updatePost" parameterType="com.example.weboard.model.Post">
+        UPDATE post SET title=#{title},
+                        updated_by=#{updatedBy},
+                        updated_at=#{updatedAt},
+                        views=#{views},
+                        content_text=#{contentText},
+                        file_data=#{fileData}
+            WHERE post_id = #{postId}
+    </update>
+
+    <delete id="deletePost" parameterType="int">
+        DELETE FROM post
+            WHERE post_id=#{postId}
+    </delete>
+</mapper>

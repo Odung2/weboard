@@ -3,6 +3,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.weboard.mapper.UserMapper">
-    <select id="getUserById" parameterType="int" resultType=""
+    <select id="getUserById" parameterType="int" resultType="com.example.weboard.model.User">
+        SELECT * FROM user where user_id = #{userId}
+    </select>
+
+    <insert id="insertUser" parameterType="com.example.weboard.model.User">
+        INSERT INTO user (user_defined_id, nickname, password, updated_by, updated_at)
+        VALUES (#{userDefinedId}, #{nickname}, #{password}, null, null)
+    </insert>
+
+    <update id="updateUser" parameterType="com.example.weboard.model.User">
+        UPDATE user SET user_defined_id = #{userDefinedId},
+                        nickname = #{nickname},
+                        password = #{password},
+                        updated_by = #{userId},
+                        updated_at = #{updatedAt}
+            WHERE user_id=#{userId}
+    </update>
+
+    <delete id="deleteUser" parameterType="int">
+        DELETE FROM user
+            WHERE user_id = #{userId}
+    </delete>
 
 </mapper>
