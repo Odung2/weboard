@@ -7,6 +7,10 @@
         SELECT * FROM post WHERE post_id=#{postId}
     </select>
 
+    <select id="getPostAll" resultType="com.example.weboard.model.Post">
+        SELECT * FROM post
+    </select>
+
     <insert id="insertPost" parameterType="com.example.weboard.model.Post">
         INSERT INTO post (title, created_by, updated_by, updated_at, views, content_text, file_data)
         VALUES (#{title}, #{createdBy}, null, null, #{views}, #{contentText}, #{fileData});

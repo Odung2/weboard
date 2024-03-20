@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("weboard/posts")
 public class PostController {
@@ -23,6 +25,16 @@ public class PostController {
         Post post = postService.getPostById(postId);
         if (post != null) {
             return ResponseEntity.ok(post);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<Post>> getPostAll(){
+        List<Post> postAll = postService.getPostAll();
+        if(postAll != null){
+            return ResponseEntity.ok(postAll);
         } else {
             return ResponseEntity.notFound().build();
         }

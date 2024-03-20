@@ -4,6 +4,8 @@ import com.example.weboard.mapper.PostMapper;
 import com.example.weboard.model.Post;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PostService {
     private final PostMapper postMapper;
@@ -12,6 +14,7 @@ public class PostService {
         this.postMapper=postMapper;
     }
 
+    public List<Post> getPostAll(){ return postMapper.getPostAll(); };
     public Post getPostById(int postId){
         return postMapper.getPostById(postId);
     }
