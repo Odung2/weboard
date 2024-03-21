@@ -4,16 +4,16 @@
 
 <mapper namespace="com.example.weboard.mapper.CommentMapper">
 
-    <select id="getCommentByPostId" parameterType="int" resultType="com.example.weboard.model.Comment">
+    <select id="getCommentByPostId" parameterType="int" resultType="com.example.weboard.dto.CommentDTO">
         SELECT * FROM comment WHERE post_id=#{postId}
     </select>
 
-    <insert id="insertComment" parameterType="com.example.weboard.model.Comment">
+    <insert id="insertComment" parameterType="com.example.weboard.dto.CommentDTO">
         INSERT INTO comment (post_id, user_id, comment_text, created_by, updated_by, updated_at)
         VALUES ( #{postId}, #{userId}, #{commentText}, #{userId}, null, null)
     </insert>
 
-    <update id="updateComment" parameterType="com.example.weboard.model.Comment">
+    <update id="updateComment" parameterType="com.example.weboard.dto.CommentDTO">
         UPDATE comment SET comment_text=#{commentText},
                         updated_by=#{updatedBy},
                         updated_at=#{updatedAt}

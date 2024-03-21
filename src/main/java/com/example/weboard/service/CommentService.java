@@ -1,7 +1,7 @@
 package com.example.weboard.service;
 
 import com.example.weboard.mapper.CommentMapper;
-import com.example.weboard.model.Comment;
+import com.example.weboard.dto.CommentDTO;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,15 +13,15 @@ public class CommentService {
         this.commentMapper=commentMapper;
     }
 
-    public Comment getCommentByPostId(int postId){
+    public CommentDTO getCommentByPostId(int postId){
         return commentMapper.getCommentByPostId(postId);
     }
 
-    public void insertComment(Comment comment){
+    public void insertComment(CommentDTO comment){
         commentMapper.insertComment(comment);
     }
 
-    public void updateComment(Comment comment){
+    public void updateComment(CommentDTO comment){
         commentMapper.updateComment(comment);
     }
 

@@ -1,6 +1,6 @@
 package com.example.weboard.mapper;
 
-import com.example.weboard.model.Post;
+import com.example.weboard.dto.PostDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -8,12 +8,12 @@ import java.util.List;
 @Mapper
 public interface PostMapper {
 
-    Post getPostById(int postId);
+    PostDTO getPostById(int postId);
 
-    List<Post> getPostAll();
-    void insertPost(Post post);
+    List<PostDTO> getPostAll();
+    void insertPost(PostDTO post);
 
-    void updatePost(Post post);
+    void updatePost(PostDTO post);
 
     void deletePost(int postId);
 }

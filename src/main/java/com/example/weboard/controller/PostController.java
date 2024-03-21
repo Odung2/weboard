@@ -1,8 +1,7 @@
 package com.example.weboard.controller;
 
-import com.example.weboard.model.Post;
+import com.example.weboard.dto.PostDTO;
 import com.example.weboard.service.PostService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,8 +20,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPostById(@PathVariable int postId) {
-        Post post = postService.getPostById(postId);
+    public ResponseEntity<PostDTO> getPostById(@PathVariable int postId) {
+        PostDTO post = postService.getPostById(postId);
         if (post != null) {
             return ResponseEntity.ok(post);
         } else {
@@ -30,9 +29,9 @@ public class PostController {
         }
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<Post>> getPostAll(){
-        List<Post> postAll = postService.getPostAll();
+    @GetMapping
+    public ResponseEntity<List<PostDTO>> getPostAll(){
+        List<PostDTO> postAll = postService.getPostAll();
         if(postAll != null){
             return ResponseEntity.ok(postAll);
         } else {
@@ -40,14 +39,14 @@ public class PostController {
         }
     }
 
-    @PostMapping("/insertPost")
-    public ResponseEntity<Void> insertPost(@RequestBody Post post) {
+    @PostMapping
+    public ResponseEntity<Void> insertPost(@RequestBody PostDTO post) {
         postService.insertPost(post);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<Void> updatePost(@PathVariable int postId, @RequestBody Post post) {
+    public ResponseEntity<Void> updatePost(@PathVariable int postId, @RequestBody PostDTO post) {
         post.setPostId(postId);
         postService.updatePost(post);
         return ResponseEntity.ok().build();

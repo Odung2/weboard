@@ -1,7 +1,7 @@
 package com.example.weboard.service;
 
 import com.example.weboard.mapper.PostMapper;
-import com.example.weboard.model.Post;
+import com.example.weboard.dto.PostDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,16 +14,16 @@ public class PostService {
         this.postMapper=postMapper;
     }
 
-    public List<Post> getPostAll(){ return postMapper.getPostAll(); };
-    public Post getPostById(int postId){
+    public List<PostDTO> getPostAll(){ return postMapper.getPostAll(); };
+    public PostDTO getPostById(int postId){
         return postMapper.getPostById(postId);
     }
 
-    public void insertPost(Post post){
+    public void insertPost(PostDTO post){
         postMapper.insertPost(post);
     }
 
-    public void updatePost(Post post){
+    public void updatePost(PostDTO post){
         postMapper.updatePost(post);
     }
 

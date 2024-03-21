@@ -1,11 +1,11 @@
-package com.example.weboard.model;
+package com.example.weboard.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Post {
+public class PostDTO {
     private int postId;
     private String title;
     private int createdBy;

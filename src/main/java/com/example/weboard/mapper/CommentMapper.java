@@ -1,15 +1,14 @@
 package com.example.weboard.mapper;
 
-import com.example.weboard.model.Comment;
+import com.example.weboard.dto.CommentDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface CommentMapper {
-    Comment getCommentByPostId(int postId);
+    CommentDTO getCommentByPostId(int postId);
+    void insertComment(CommentDTO comment);
 
-    void insertComment(Comment comment);
-
-    void updateComment(Comment comment);
+    void updateComment(CommentDTO comment);
 
     void deleteComment(int commentId);
 }
