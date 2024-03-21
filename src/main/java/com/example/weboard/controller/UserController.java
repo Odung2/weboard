@@ -20,8 +20,8 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable int userId) {
-        UserDTO user = userService.getUserById(userId);
+    public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
+        UserDTO user = userService.getUserById(id);
         if (user != null) {
             return ResponseEntity.ok(user);
         } else return ResponseEntity.notFound().build();
@@ -38,8 +38,8 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<Void> updateUser(@PathVariable int userId, @RequestBody UserDTO user){
-        user.setUserId(userId);
+    public ResponseEntity<Void> updateUser(@PathVariable int id, @RequestBody UserDTO user){
+        user.setId(id);
         try {
             userService.updateUser(user);
         } catch (NoSuchAlgorithmException e) {
@@ -49,8 +49,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int userId){
-        userService.deleteUser(userId);
+    public ResponseEntity<Void> deleteUser(@PathVariable int id){
+        userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
 }

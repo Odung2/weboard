@@ -16,13 +16,13 @@ public class UserService {
         this.userMapper=userMapper;
     }
 
-    public UserDTO getUserById(int userId){
-        return userMapper.getUserById(userId);
+    public UserDTO getUserById(int id){
+        return userMapper.getUserById(id);
     }
 
     public int getIdByUserId(String userId){return userMapper.getIdByUserId(userId);}
 
-    public String getPasswordById(int userId) { return userMapper.getPasswordById(userId); }
+    public String getPasswordById(int id) { return userMapper.getPasswordById(id); }
 
     public void insertUser(UserDTO user) throws NoSuchAlgorithmException{
         String plainPassword = user.getPassword();
@@ -38,8 +38,8 @@ public class UserService {
         userMapper.updateUser(user);
     }
 
-    public void deleteUser(int userId){
-        userMapper.deleteUser(userId);
+    public void deleteUser(int id){
+        userMapper.deleteUser(id);
     }
 
     public String plainToSha256(String plaintext) throws NoSuchAlgorithmException{
