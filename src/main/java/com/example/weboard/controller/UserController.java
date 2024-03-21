@@ -19,7 +19,7 @@ public class UserController {
         this.userService=userService;
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
         UserDTO user = userService.getUserById(id);
         if (user != null) {
@@ -37,7 +37,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> updateUser(@PathVariable int id, @RequestBody UserDTO user){
         user.setId(id);
         try {
@@ -48,7 +48,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable int id){
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
