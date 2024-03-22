@@ -1,60 +1,52 @@
 package com.example.weboard.controller;
 
 import com.example.weboard.dto.PostDTO;
+import com.example.weboard.service.AuthService;
 import com.example.weboard.service.PostService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("weboard/posts")
 public class PostController {
 
     private final PostService postService;
-
-    public PostController(PostService postService) {
+    private final AuthService authService;
+    public PostController(PostService postService,AuthService authService) {
         this.postService = postService;
+        this.authService = authService;
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDTO> getPostById(@PathVariable int postId) {
-        PostDTO post = postService.getPostById(postId);
-        if (post != null) {
-            return ResponseEntity.ok(post);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public PostDTO getPostById(@PathVariable int postId) {
+        return postService.getPostById(postId);
     }
 
     @GetMapping
-    public ResponseEntity<List<PostDTO>> getPostAll(){
-        List<PostDTO> postAll = postService.getPostAll();
-        if(postAll != null){
-            return ResponseEntity.ok(postAll);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public List<PostDTO> getPostAll(){
+        return postService.getPostAll();
     }
 
     @PostMapping
-    public ResponseEntity<Void> insertPost(@RequestBody PostDTO post) {
+    public void insertPost(@RequestBody PostDTO post, @RequestHeader("Authorization") String jwttoken) {
+        Integer userId = authService.getIdFromToken(jwttoken);
+        post.setCreatedBy(userId);
         postService.insertPost(post);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<Void> updatePost(@PathVariable int postId, @RequestBody PostDTO post) {
+    public void updatePost(@PathVariable int postId, @RequestBody PostDTO post, @RequestHeader("Authorization") String jwttoken) {
         post.setPostId(postId);
+        Integer userId = authService.getIdFromToken(jwttoken);
+        post.setUpdatedBy(userId);
         postService.updatePost(post);
-        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable int postId) {
+    public void deletePost(@PathVariable int postId) {
+        //삭제 시 createdBy와 jwttoken의 Id가 동일한지 검증하는 로직 필요
         postService.deletePost(postId);
-        return ResponseEntity.ok().build();
     }
 }

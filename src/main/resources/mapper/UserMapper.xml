@@ -3,20 +3,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.weboard.mapper.UserMapper">
-    <select id="getUserById" parameterType="int" resultType="com.example.weboard.dto.UserDTO">
+    <select id="getUserById" parameterType="Integer" resultType="com.example.weboard.dto.UserDTO">
         SELECT * FROM user where id = #{id}
     </select>
 
-    <select id="getIdByUserId" parameterType="String" resultType="int">
+    <select id="getIdByUserId" parameterType="String" resultType="Integer">
         SELECT id FROM user WHERE user_id =#{userId}
     </select>
+
     <select id="getPasswordById" parameterType="int" resultType="String">
         SELECT password FROM user WHERE id = #{id}
     </select>
 
     <insert id="insertUser" parameterType="com.example.weboard.dto.UserDTO">
         INSERT INTO user (user_id, nickname, password, updated_by, updated_at)
-        VALUES (#{userDefinedId}, #{nickname}, #{password}, null, null)
+        VALUES (#{userId}, #{nickname}, #{password}, null, null)
     </insert>
 
     <update id="updateUser" parameterType="com.example.weboard.dto.UserDTO">

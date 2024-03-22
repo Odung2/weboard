@@ -16,11 +16,11 @@ public class UserService {
         this.userMapper=userMapper;
     }
 
-    public UserDTO getUserById(int id){
+    public UserDTO getUserById(Integer id){
         return userMapper.getUserById(id);
     }
 
-    public int getIdByUserId(String userId){return userMapper.getIdByUserId(userId);}
+    public Integer getIdByUserId(String userId){return userMapper.getIdByUserId(userId);}
 
     public String getPasswordById(int id) { return userMapper.getPasswordById(id); }
 
