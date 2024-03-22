@@ -51,9 +51,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public void login(@RequestParam(value="userId") String userId, @RequestParam(value="password") String password){
+    public String login(@RequestParam(value="userId") String userId, @RequestParam(value="password") String password){
         try {
-            authService.loginAndJwtProvide(userId, password);
+            return authService.loginAndJwtProvide(userId, password);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

@@ -12,7 +12,7 @@
     </select>
 
     <insert id="insertPost" parameterType="com.example.weboard.dto.PostDTO">
-        INSERT INTO post (title, created_by, updated_by, updated_at, views, content_text, file_data)
+        INSERT INTO post (title, created_by, updated_by, updated_at, views, contents, file_path)
         VALUES (#{title}, #{createdBy}, null, null, #{views}, #{contentText}, #{fileData});
     </insert>
 

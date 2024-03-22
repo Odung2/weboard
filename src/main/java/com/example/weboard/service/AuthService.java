@@ -12,6 +12,8 @@ import com.example.weboard.dto.PostDTO;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -56,8 +58,9 @@ public class AuthService {
                 .claim("userId", user.getUserId())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
+
     }
 
     public Integer getIdFromToken(String jwttoken) {
@@ -67,20 +70,27 @@ public class AuthService {
         String jwtToken = jwttoken.substring(7);
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(getSigningkey())
+                    .setSigningKey(getSigningKey())
                     .build()
-                    .parseClaimsJws(jwttoken);
+                    .parseClaimsJws(jwtToken);
 
-            return Integer.parseInt(claims.getBody().getId());
+            return Integer.parseInt((String) claims.getBody().getSubject());
+//            return 5;
         } catch (ExpiredJwtException e) {
             throw new RuntimeException("토큰이 만료되었습니다.");
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("토큰이 유효하지 않습니다.");
+        } catch (JwtException e) {
+            throw new MalformedJwtException("토큰이 유효하지 않습니다.");
         }
     }
 
-    private SecretKey getSigningkey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+//    private SecretKey getSigningkey() {
+//        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+//    }
+
+    private Key getSigningKey() {
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
+
 
 }
