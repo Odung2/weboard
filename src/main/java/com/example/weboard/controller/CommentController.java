@@ -5,6 +5,8 @@ import com.example.weboard.service.CommentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("weboard/comments")
 public class CommentController {
@@ -16,7 +18,7 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}")
-    public CommentDTO getCommentByPostId(@PathVariable int postId){
+    public List<CommentDTO> getCommentByPostId(@PathVariable int postId){
         return commentService.getCommentByPostId(postId);
     }
 

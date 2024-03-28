@@ -2,6 +2,8 @@ package com.example.weboard.service;
 
 import com.example.weboard.mapper.UserMapper;
 import com.example.weboard.dto.UserDTO;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -16,11 +18,26 @@ public class UserService {
         this.userMapper=userMapper;
     }
 
-    public UserDTO getUserById(Integer id){
-        return userMapper.getUserById(id);
+    public UserDTO getUserByIdOrUserId(Integer id){
+        UserDTO user = new UserDTO();
+        user.setId(id);
+        user.setUserId(null);
+        user.setPassword(null);
+        user.setNickname(null);
+        user.setUpdatedBy(null);
+        user.setUpdatedAt(null);
+        return userMapper.getUserByIdOrUserId(user);
     }
-
-    public Integer getIdByUserId(String userId){return userMapper.getIdByUserId(userId);}
+    public UserDTO getUserByIdOrUserId(String userId){
+        UserDTO user = new UserDTO();
+        user.setId(0);
+        user.setUserId(userId);
+        user.setPassword(null);
+        user.setNickname(null);
+        user.setUpdatedBy(null);
+        user.setUpdatedAt(null);
+        return userMapper.getUserByIdOrUserId(user);
+    }
 
     public String getPasswordById(int id) { return userMapper.getPasswordById(id); }
 

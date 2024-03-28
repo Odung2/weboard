@@ -4,6 +4,8 @@ import com.example.weboard.mapper.CommentMapper;
 import com.example.weboard.dto.CommentDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CommentService {
 
@@ -13,9 +15,10 @@ public class CommentService {
         this.commentMapper=commentMapper;
     }
 
-    public CommentDTO getCommentByPostId(int postId){
+    public List<CommentDTO> getCommentByPostId(int postId){
         return commentMapper.getCommentByPostId(postId);
     }
+
 
     public void insertComment(CommentDTO comment){
         commentMapper.insertComment(comment);
