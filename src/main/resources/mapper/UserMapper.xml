@@ -33,7 +33,7 @@
         UPDATE user SET user_id = #{userId},
                         nickname = #{nickname},
                         password = #{password},
-                        updated_by = #{userId},
+                        updated_by = #{id},
                         updated_at = #{updatedAt}
             WHERE id=#{id}
     </update>

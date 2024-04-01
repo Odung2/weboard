@@ -9,7 +9,7 @@ public class PostDTO {
     private int postId;
     private String title;
     private int createdBy;
-//    private String createdAt;
+    private String createdAt;
     private Integer updatedBy;
     private String updatedAt;
     private int views;

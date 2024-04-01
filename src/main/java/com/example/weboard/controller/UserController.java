@@ -36,8 +36,12 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public void updateUser(@PathVariable int id, @RequestBody UserDTO userDTO){
+    public void updateUser(@RequestHeader("Authorization") String jwttoken, @RequestBody UserDTO userDTO, @PathVariable int id){
+        Integer idFromJwt = authService.getIdFromToken(jwttoken);
         userDTO.setId(id);
+        if (idFromJwt!=id){
+            return;
+        }
         try {
             userService.updateUser(userDTO);
         } catch (NoSuchAlgorithmException e) {

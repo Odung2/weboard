@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -24,6 +25,7 @@ public class UserService {
         user.setUserId(null);
         user.setPassword(null);
         user.setNickname(null);
+        user.setCreatedAt(null);
         user.setUpdatedBy(null);
         user.setUpdatedAt(null);
         return userMapper.getUserByIdOrUserId(user);
@@ -49,9 +51,28 @@ public class UserService {
     }
 
     public void updateUser(UserDTO user) throws NoSuchAlgorithmException{
-        String plainPassword = user.getPassword();
-        String sha256Password = plainToSha256(plainPassword);
-        user.setPassword(sha256Password);
+        UserDTO originalUser = getUserByIdOrUserId(user.getId());
+        String message = "";
+        if(user.getUserId()==null){
+            user.setUserId(originalUser.getUserId());
+        }
+        if(user.getNickname()==null){
+            user.setNickname(originalUser.getNickname());
+        }
+        if(user.getUpdatedBy()==null){
+            user.setUpdatedBy(originalUser.getId());
+        }
+        if(user.getPassword()==null){
+            user.setPassword(originalUser.getPassword());
+
+        }else{
+            String plainPassword = user.getPassword();
+            String sha256Password = plainToSha256(plainPassword);
+            user.setPassword(sha256Password);
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+
         userMapper.updateUser(user);
     }
 
