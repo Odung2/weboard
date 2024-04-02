@@ -17,12 +17,27 @@
     </insert>
 
     <update id="updatePost" parameterType="com.example.weboard.dto.PostDTO">
-        UPDATE post SET title=#{title},
-                        updated_by=#{updatedBy},
-                        updated_at=#{updatedAt},
-                        views=#{views},
-                        content_text=#{contentText},
-                        file_data=#{fileData}
+        UPDATE post
+        <set>
+            <if test="title != null">
+                title=#{title},
+            </if>
+            <if test="updateBy != null">
+                updated_by=#{updatedBy},
+            </if>
+            <if test="updatedAt != null">
+                updated_at=#{updatedAt},
+            </if>
+            <if test="views != null">
+                views=#{views},
+            </if>
+            <if test="contentText != null">
+                content_text=#{contentText},
+            </if>
+            <if test="fileData != null">
+                file_data=#{fileData},
+            </if>
+        </set>
             WHERE post_id = #{postId}
     </update>
 

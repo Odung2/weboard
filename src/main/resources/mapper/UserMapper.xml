@@ -30,13 +30,27 @@
     </insert>
 
     <update id="updateUser" parameterType="com.example.weboard.dto.UserDTO">
-        UPDATE user SET user_id = #{userId},
-                        nickname = #{nickname},
-                        password = #{password},
-                        updated_by = #{id},
-                        updated_at = #{updatedAt}
-            WHERE id=#{id}
+        UPDATE user
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="nickname != null">
+                nickname = #{nickname},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="updatedBy != null">
+                updated_by = #{updatedBy},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt},
+            </if>
+        </set>
+        WHERE id=#{id}
     </update>
+
 
     <delete id="deleteUser" parameterType="int">
         DELETE FROM user

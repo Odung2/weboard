@@ -14,9 +14,18 @@
     </insert>
 
     <update id="updateComment" parameterType="com.example.weboard.dto.CommentDTO">
-        UPDATE comment SET comment_text=#{commentText},
-                        updated_by=#{updatedBy},
-                        updated_at=#{updatedAt}
+        UPDATE comment
+        <set>
+            <if test="commentText != null">
+                comment_text=#{commentText},
+            </if>
+            <if test="updatedBy != null">
+                updated_by=#{updatedBy},
+            </if>
+            <if test="updatedAt != null">
+                updated_at=#{updatedAt},
+            </if>
+        </set>
             WHERE comment_id=#{commentId}
     </update>
 
