@@ -13,7 +13,7 @@
 
     <insert id="insertPost" parameterType="com.example.weboard.dto.PostDTO">
         INSERT INTO post (title, created_by, updated_by, updated_at, views, contents, file_path)
-        VALUES (#{title}, #{createdBy}, null, null, #{views}, #{contentText}, #{fileData});
+        VALUES (#{title}, #{createdBy}, null, null, #{views}, #{contents}, #{fileData});
     </insert>
 
     <update id="updatePost" parameterType="com.example.weboard.dto.PostDTO">
@@ -32,7 +32,7 @@
                 views=#{views},
             </if>
             <if test="contentText != null">
-                content_text=#{contentText},
+                contents=#{contents},
             </if>
             <if test="fileData != null">
                 file_data=#{fileData},

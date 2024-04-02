@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins="http://localhost:5173")
 @RequestMapping("weboard/posts")
 public class PostController {
 
@@ -30,18 +31,18 @@ public class PostController {
     }
 
     @PostMapping
-    public void insertPost(@RequestBody PostDTO post, @RequestHeader("Authorization") String jwttoken) {
+    public void insertPost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") String jwttoken) {
         Integer userId = authService.getIdFromToken(jwttoken);
-        post.setCreatedBy(userId);
-        postService.insertPost(post);
+        postDTO.setCreatedBy(userId);
+        postService.insertPost(postDTO);
     }
 
     @PutMapping("/{postId}")
-    public void updatePost(@PathVariable int postId, @RequestBody PostDTO post, @RequestHeader("Authorization") String jwttoken) {
-        post.setPostId(postId);
+    public void updatePost(@PathVariable int postId, @RequestBody PostDTO postDTO, @RequestHeader("Authorization") String jwttoken) {
+        postDTO.setPostId(postId);
         Integer userId = authService.getIdFromToken(jwttoken);
-        post.setUpdatedBy(userId);
-        postService.updatePost(post);
+        postDTO.setUpdatedBy(userId);
+        postService.updatePost(postDTO);
     }
 
     @DeleteMapping("/{postId}")

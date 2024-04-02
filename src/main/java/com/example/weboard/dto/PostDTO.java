@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 public class PostDTO {
     private int postId;
     private String title;
+    private int views;
+    private String contents;
+    private byte[] fileData;
     private int createdBy;
     private String createdAt;
     private Integer updatedBy;
     private String updatedAt;
-    private int views;
-    private String contentText;
-    private byte[] fileData;
 }

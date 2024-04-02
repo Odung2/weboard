@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.NoSuchAlgorithmException;
 
 @RequestMapping("/weboard/users")
+@CrossOrigin(origins="http://localhost:5173")
 @RestController
 public class UserController {
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins="http://localhost:5173")
 @RequestMapping("weboard/comments")
 public class CommentController {
 
@@ -23,14 +24,14 @@ public class CommentController {
     }
 
     @PostMapping
-    public void insertComment(@RequestBody CommentDTO comment){
-        commentService.insertComment(comment);
+    public void insertComment(@RequestBody CommentDTO commentDTO){
+        commentService.insertComment(commentDTO);
     }
 
     @PutMapping("/{commentId}")
-    public void updateComment(@PathVariable int commentId, @RequestBody CommentDTO comment){
-        comment.setCommentId(commentId);
-        commentService.updateComment(comment);
+    public void updateComment(@PathVariable int commentId, @RequestBody CommentDTO commentDTO){
+        commentDTO.setCommentId(commentId);
+        commentService.updateComment(commentDTO);
     }
 
     @DeleteMapping("/{commentId}")
