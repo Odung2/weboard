@@ -3,19 +3,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.weboard.mapper.UserMapper">
-    <select id="getUserByIdOrUserId" parameterType="java.lang.Object" resultType="com.example.weboard.dto.UserDTO">
+    <select id="getUserByIdOrUserId" parameterType="UserDTO" resultType="UserDTO">
         SELECT * FROM user where
         <choose>
             <when test="id != 0">
                 id = #{id}
             </when>
-            <otherwise>
+            <when test="userId != null OR userId !=''">
                 user_id =#{userId}
-            </otherwise>
+            </when>
         </choose>
 
     </select>
+<!-- 패키지 만들 때 com. 회사 이름 . 서비스 .
+패키지 경로 풀로 다 쓰지 말고
 
+ -->
 <!--    <select id="getIdByUserId" parameterType="String" resultType="Integer">-->
 <!--        SELECT id FROM user WHERE user_id =#{userId}-->
 <!--    </select>-->

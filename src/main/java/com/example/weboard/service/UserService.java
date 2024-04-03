@@ -19,26 +19,8 @@ public class UserService {
         this.userMapper=userMapper;
     }
 
-    public UserDTO getUserByIdOrUserId(Integer id){
-        UserDTO user = new UserDTO();
-        user.setId(id);
-        user.setUserId(null);
-        user.setPassword(null);
-        user.setNickname(null);
-        user.setCreatedAt(null);
-        user.setUpdatedBy(null);
-        user.setUpdatedAt(null);
-        return userMapper.getUserByIdOrUserId(user);
-    }
-    public UserDTO getUserByIdOrUserId(String userId){
-        UserDTO user = new UserDTO();
-        user.setId(0);
-        user.setUserId(userId);
-        user.setPassword(null);
-        user.setNickname(null);
-        user.setUpdatedBy(null);
-        user.setUpdatedAt(null);
-        return userMapper.getUserByIdOrUserId(user);
+    public UserDTO getUserByIdOrUserId(UserDTO param){ //user
+        return userMapper.getUserByIdOrUserId(param);
     }
 
     public String getPasswordById(int id) { return userMapper.getPasswordById(id); }

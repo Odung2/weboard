@@ -19,11 +19,11 @@ public class UserController {
     private final AuthService authService;
 
     @GetMapping("/{id}")
-    public UserDTO getUserById(@RequestHeader("Authorization") String jwttoken, @PathVariable int id) {
-        if(authService.compareJwtToId(id, jwttoken)){
+    public UserDTO getUserById(@RequestHeader("Authorization") String jwttoken, @PathVariable int id) { // intercepter 를 이용 Authorization을 매번 체크? ->
+        if(authService.compareJwtToId(id, jwttoken)){ // 순서.. param RESPONSE TYPE 정의 해서 에러코드 -메시지- 데이터 0 " 메시지 없음" "data 안에 해당되는 스트럭쳐"
             return userService.getUserByIdOrUserId(id);
         }
-        throw new RuntimeException("본인이 아닌 유저의 정보를 확인할 수 없습니다.");
+        throw new RuntimeException("본인이 아닌 유저의 정보를 확인할 수 없습니다."); // 에러코드 에러메시지 status http status 유저 200 정상 런타임 말고 ... RETURN DATA TYPE을 만들기. 응답 값도.  데이터 스트럭쳐 에러 코드: "INTEGER" 에러코드 아니면 "0" " OKAY" // 에러면 "100 " "200" "300" .... 번호에 대해 구간을 정의. 에러코드만 봐도..
     }
 
     @PostMapping("/signup")

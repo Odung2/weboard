@@ -38,7 +38,7 @@ public class AuthService {
         }
         return true;
     }
-    public String loginAndJwtProvide(String userId, String password) throws NoSuchAlgorithmException {
+    public String loginAndJwtProvide(String userId, String password) throws NoSuchAlgorithmException { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
         UserDTO user = userService.getUserByIdOrUserId(userId);
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다.");
