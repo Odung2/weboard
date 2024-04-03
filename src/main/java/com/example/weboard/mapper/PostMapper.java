@@ -11,6 +11,7 @@ public interface PostMapper {
     PostDTO getPostById(int postId);
 
     List<PostDTO> getPostAll();
+    List<PostDTO> getPostAllByOffset(int offset);
     void insertPost(PostDTO post);
 
     void updatePost(PostDTO post);

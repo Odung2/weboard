@@ -2,21 +2,18 @@ package com.example.weboard.controller;
 
 import com.example.weboard.dto.CommentDTO;
 import com.example.weboard.service.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins="http://localhost:5173")
 @RequestMapping("weboard/comments")
+@RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
-
-    public CommentController(CommentService commentService){
-        this.commentService=commentService;
-    }
 
     @GetMapping("/{postId}")
     public List<CommentDTO> getCommentByPostId(@PathVariable int postId){

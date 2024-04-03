@@ -4,27 +4,26 @@ import com.example.weboard.dto.UserDTO;
 import com.example.weboard.service.AuthService;
 import com.example.weboard.service.UserService;
 import jakarta.websocket.server.PathParam;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 
 @RequestMapping("/weboard/users")
-@CrossOrigin(origins="http://localhost:5173")
 @RestController
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final AuthService authService;
 
-    public UserController(UserService userService, AuthService authService){
-        this.userService=userService;
-        this.authService = authService;
-    }
-
     @GetMapping("/{id}")
-    public UserDTO getUserById(@PathVariable int id) {
-        return userService.getUserByIdOrUserId(id);
+    public UserDTO getUserById(@RequestHeader("Authorization") String jwttoken, @PathVariable int id) {
+        if(authService.compareJwtToId(id, jwttoken)){
+            return userService.getUserByIdOrUserId(id);
+        }
+        throw new RuntimeException("본인이 아닌 유저의 정보를 확인할 수 없습니다.");
     }
 
     @PostMapping("/signup")
@@ -37,21 +36,23 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public void updateUser(@RequestHeader("Authorization") String jwttoken, @RequestBody UserDTO userDTO, @PathVariable int id){
-        Integer idFromJwt = authService.getIdFromToken(jwttoken);
-        userDTO.setId(id);
-        if (idFromJwt!=id){
-            return;
+    public int updateUser(@RequestHeader("Authorization") String jwttoken, @RequestBody UserDTO userDTO, @PathVariable int id){
+        if(authService.compareJwtToId(id, jwttoken)){
+            try {
+                return userService.updateUser(userDTO);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
         }
-        try {
-            userService.updateUser(userDTO);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        return 0;
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable int id){
+    public void deleteUser(@RequestHeader("Authorization") String jwttoken, @PathVariable int id){
+        Integer idFromJwt = authService.getIdFromToken(jwttoken);
+        if (idFromJwt!=id){
+            return;
+        }
         userService.deleteUser(id);
     }
 

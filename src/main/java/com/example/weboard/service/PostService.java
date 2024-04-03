@@ -14,7 +14,9 @@ public class PostService {
         this.postMapper=postMapper;
     }
 
-    public List<PostDTO> getPostAll(){ return postMapper.getPostAll(); };
+    public List<PostDTO> getPostAll() { return postMapper.getPostAll(); };
+
+    public List<PostDTO> getPostAllByOffset(Integer offset) { return postMapper.getPostAllByOffset(offset); };
     public PostDTO getPostById(int postId){
         return postMapper.getPostById(postId);
     }

@@ -11,6 +11,13 @@
         SELECT * FROM post
     </select>
 
+    <select id="getPostAllByOffset" parameterType="int" resultType="com.example.weboard.dto.PostDTO">
+        SELECT * FROM post LIMIT 5
+                 <if test="offset!=null">
+                     OFFSET #{offset}
+                 </if>
+    </select>
+
     <insert id="insertPost" parameterType="com.example.weboard.dto.PostDTO">
         INSERT INTO post (title, created_by, updated_by, updated_at, views, contents, file_path)
         VALUES (#{title}, #{createdBy}, null, null, #{views}, #{contents}, #{fileData});

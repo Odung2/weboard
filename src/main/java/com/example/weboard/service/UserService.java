@@ -50,8 +50,17 @@ public class UserService {
         userMapper.insertUser(user);
     }
 
-    public void updateUser(UserDTO user) throws NoSuchAlgorithmException{
-        String message = "";
+    public int updateUser(UserDTO user) throws NoSuchAlgorithmException{
+        int count = 0;
+        if(user.getUserId()!=null){
+            count += 1;
+        }
+        if(user.getNickname()!=null){
+            count += 1;
+        }
+        if(user.getPassword()!=null){
+            count += 1;
+        }
 
         String plainPassword = user.getPassword();
         if(plainPassword!=null){
@@ -61,6 +70,7 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
         userMapper.updateUser(user);
+        return count;
     }
 
     public void deleteUser(int id){

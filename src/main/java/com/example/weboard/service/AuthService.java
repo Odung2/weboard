@@ -2,6 +2,7 @@ package com.example.weboard.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.weboard.mapper.CommentMapper;
 import com.example.weboard.dto.CommentDTO;
@@ -19,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
     private final UserMapper userMapper;
     private final UserService userService;
@@ -29,11 +31,13 @@ public class AuthService {
     @Value("${jwt.expiration}")
     private int jwtExpirationMs;
 
-    public AuthService(UserMapper userMapper, UserService userService) {
-        this.userMapper = userMapper;
-        this.userService = userService;
+    public Boolean compareJwtToId(int id, String jwttoken){
+        int idFromJwt = getIdFromToken(jwttoken);
+        if (idFromJwt!=id){
+            return false;
+        }
+        return true;
     }
-
     public String loginAndJwtProvide(String userId, String password) throws NoSuchAlgorithmException {
         UserDTO user = userService.getUserByIdOrUserId(userId);
         if (user == null) {
@@ -83,9 +87,6 @@ public class AuthService {
         }
     }
 
-//    private SecretKey getSigningkey() {
-//        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
-//    }
 
     private Key getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
