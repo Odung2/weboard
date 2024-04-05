@@ -3,6 +3,7 @@ package com.example.weboard.controller;
 import com.example.weboard.dto.CommentDTO;
 import com.example.weboard.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,23 +17,23 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/{postId}")
-    public List<CommentDTO> getCommentByPostId(@PathVariable int postId){
+    public ResponseEntity<List<CommentDTO>> getCommentByPostId(@PathVariable int postId){
         return commentService.getCommentByPostId(postId);
     }
 
     @PostMapping
-    public void insertComment(@RequestBody CommentDTO commentDTO){
-        commentService.insertComment(commentDTO);
+    public ResponseEntity<String> insertComment(@RequestHeader("Authroization") String jwttoken, @RequestBody CommentDTO commentDTO){
+        return commentService.insertComment(commentDTO);
     }
 
     @PutMapping("/{commentId}")
-    public void updateComment(@PathVariable int commentId, @RequestBody CommentDTO commentDTO){
+    public ResponseEntity<String> updateComment(@RequestHeader("Authroization") String jwttoken, @PathVariable int commentId, @RequestBody CommentDTO commentDTO){
         commentDTO.setCommentId(commentId);
-        commentService.updateComment(commentDTO);
+        return commentService.updateComment(commentDTO);
     }
 
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@PathVariable int commentId){
-        commentService.deleteComment(commentId);
+    public ResponseEntity<String> deleteComment(@RequestHeader("Authroization") String jwttoken,  @PathVariable int commentId){
+        return commentService.deleteComment(commentId);
     }
 }

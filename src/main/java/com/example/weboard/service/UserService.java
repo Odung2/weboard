@@ -2,8 +2,8 @@ package com.example.weboard.service;
 
 import com.example.weboard.mapper.UserMapper;
 import com.example.weboard.dto.UserDTO;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -12,28 +12,37 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserMapper userMapper;
 
-    public UserService(UserMapper userMapper){
-        this.userMapper=userMapper;
+    public ResponseEntity<UserDTO> getUserByIdOrUserId(int param){ //user
+        UserDTO userparam = new UserDTO();
+        userparam.setId(param);
+        UserDTO user = userMapper.getUserByIdOrUserId(userparam);
+        return ResponseEntity.status(200).body(user);
+    }
+    public ResponseEntity<UserDTO> getUserByIdOrUserId(String param){ //user
+        UserDTO userparam = new UserDTO();
+        userparam.setUserId(param);
+        UserDTO user = userMapper.getUserByIdOrUserId(userparam);
+        return ResponseEntity.status(200).body(user);
     }
 
-    public UserDTO getUserByIdOrUserId(UserDTO param){ //user
-        return userMapper.getUserByIdOrUserId(param);
+    public String getPasswordById(int id) {
+        return userMapper.getPasswordById(id);
     }
 
-    public String getPasswordById(int id) { return userMapper.getPasswordById(id); }
-
-    public void insertUser(UserDTO user) throws NoSuchAlgorithmException{
+    public ResponseEntity<String> insertUser(UserDTO user) {
         String plainPassword = user.getPassword();
         String sha256Password = plainToSha256(plainPassword);
         user.setPassword(sha256Password);
         userMapper.insertUser(user);
+        return ResponseEntity.status(201).body("성공적으로 유저가 생성되었습니다.");
     }
 
-    public int updateUser(UserDTO user) throws NoSuchAlgorithmException{
-        int count = 0;
+    public ResponseEntity<String> updateUser(UserDTO user) {
+        Integer count = 0;
         if(user.getUserId()!=null){
             count += 1;
         }
@@ -50,17 +59,22 @@ public class UserService {
             user.setPassword(sha256Password);
         }
         user.setUpdatedAt(LocalDateTime.now());
-
-        userMapper.updateUser(user);
-        return count;
+        String message = count.toString() + "개의 유저 속성이 업데이트 되었습니다.";
+        return ResponseEntity.status(200).body(message);
     }
 
-    public void deleteUser(int id){
+    public ResponseEntity<String> deleteUser(int id){
         userMapper.deleteUser(id);
+        return ResponseEntity.status(200).body("성공적으로 유저 정보가 삭제되었습니다.");
     }
 
-    public String plainToSha256(String plaintext) throws NoSuchAlgorithmException{
-        MessageDigest mdSHA256 = MessageDigest.getInstance("SHA-256");
+    public String plainToSha256(String plaintext) {
+        MessageDigest mdSHA256 = null;
+        try {
+            mdSHA256 = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
         byte[] sha256Password = mdSHA256.digest(plaintext.getBytes(StandardCharsets.UTF_8));
 
         StringBuilder hexString = new StringBuilder();

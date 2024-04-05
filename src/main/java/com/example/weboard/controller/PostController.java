@@ -26,7 +26,7 @@ public class PostController {
 //    public List<PostDTO> getPostAll(){
 //        return postService.getPostAll();
 //    }
-    @GetMapping()
+    @GetMapping
     public List<PostDTO> getPostAllByOffset(@RequestParam int offset) {
         return postService.getPostAllByOffset(offset);
     }
@@ -39,7 +39,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public void updatePost(@PathVariable int postId, @RequestBody PostDTO postDTO, @RequestHeader("Authorization") String jwttoken) {
+    public void updatePost(@RequestHeader("Authorization") String jwttoken, @PathVariable int postId, @RequestBody PostDTO postDTO) {
         postDTO.setPostId(postId);
         Integer userId = authService.getIdFromToken(jwttoken);
         postDTO.setUpdatedBy(userId);

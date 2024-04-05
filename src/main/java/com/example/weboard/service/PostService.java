@@ -2,18 +2,16 @@ package com.example.weboard.service;
 
 import com.example.weboard.mapper.PostMapper;
 import com.example.weboard.dto.PostDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+
 public class PostService {
     private final PostMapper postMapper;
-
-    public PostService(PostMapper postMapper){
-        this.postMapper=postMapper;
-    }
-
     public List<PostDTO> getPostAll() { return postMapper.getPostAll(); };
 
     public List<PostDTO> getPostAllByOffset(Integer offset) { return postMapper.getPostAllByOffset(offset); };

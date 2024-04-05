@@ -3,6 +3,7 @@ package com.example.weboard.service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.weboard.mapper.CommentMapper;
 import com.example.weboard.dto.CommentDTO;
@@ -38,8 +39,8 @@ public class AuthService {
         }
         return true;
     }
-    public String loginAndJwtProvide(String userId, String password) throws NoSuchAlgorithmException { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
-        UserDTO user = userService.getUserByIdOrUserId(userId);
+    public ResponseEntity<String> loginAndJwtProvide(String userId, String password) { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
+        UserDTO user = userService.getUserByIdOrUserId(userId).getBody();
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다.");
         }
@@ -49,8 +50,8 @@ public class AuthService {
         if (!storedPassword.equals(hashedPassword)) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
-
-        return generateJwtToken(user);
+        String token = generateJwtToken(user);
+        return ResponseEntity.status(200).body(token);
     }
 
     private String generateJwtToken(UserDTO user) {
@@ -79,7 +80,6 @@ public class AuthService {
                     .parseClaimsJws(jwtToken);
 
             return Integer.parseInt((String) claims.getBody().getSubject());
-//            return 5;
         } catch (ExpiredJwtException e) {
             throw new RuntimeException("토큰이 만료되었습니다.");
         } catch (JwtException e) {

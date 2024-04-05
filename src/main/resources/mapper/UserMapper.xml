@@ -4,21 +4,23 @@
 
 <mapper namespace="com.example.weboard.mapper.UserMapper">
     <select id="getUserByIdOrUserId" parameterType="UserDTO" resultType="UserDTO">
-        SELECT * FROM user where
-        <choose>
-            <when test="id != 0">
-                id = #{id}
-            </when>
-            <when test="userId != null OR userId !=''">
-                user_id =#{userId}
-            </when>
-        </choose>
-
+        SELECT * FROM user
+        <where>
+            <choose>
+                <when test="id != 0">
+                    AND id = #{id}
+                </when>
+                <when test="userId != null and userId !=''">
+                    AND user_id = #{userId}
+                </when>
+            </choose>
+        </where>
     </select>
-<!-- 패키지 만들 때 com. 회사 이름 . 서비스 .
-패키지 경로 풀로 다 쓰지 말고
 
- -->
+    <!-- 패키지 만들 때 com. 회사 이름 . 서비스 .
+    패키지 경로 풀로 다 쓰지 말고
+
+     -->
 <!--    <select id="getIdByUserId" parameterType="String" resultType="Integer">-->
 <!--        SELECT id FROM user WHERE user_id =#{userId}-->
 <!--    </select>-->

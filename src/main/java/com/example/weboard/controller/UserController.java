@@ -5,6 +5,7 @@ import com.example.weboard.service.AuthService;
 import com.example.weboard.service.UserService;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class UserController {
     private final AuthService authService;
 
     @GetMapping("/{id}")
-    public UserDTO getUserById(@RequestHeader("Authorization") String jwttoken, @PathVariable int id) { // intercepter 를 이용 Authorization을 매번 체크? ->
+    public ResponseEntity<UserDTO> getUserById(@RequestHeader("Authorization") String jwttoken, @PathVariable int id) { // interceptor 를 이용 Authorization을 매번 체크? ->
         if(authService.compareJwtToId(id, jwttoken)){ // 순서.. param RESPONSE TYPE 정의 해서 에러코드 -메시지- 데이터 0 " 메시지 없음" "data 안에 해당되는 스트럭쳐"
             return userService.getUserByIdOrUserId(id);
         }
@@ -27,42 +28,30 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public void insertUser(@RequestBody UserDTO userDTO){
-        try {
-            userService.insertUser(userDTO);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+    public ResponseEntity<String> insertUser(@RequestBody UserDTO userDTO){
+        return userService.insertUser(userDTO);
     }
 
     @PutMapping("/{id}")
-    public int updateUser(@RequestHeader("Authorization") String jwttoken, @RequestBody UserDTO userDTO, @PathVariable int id){
+    public ResponseEntity<String> updateUser(@RequestHeader("Authorization") String jwttoken, @RequestBody UserDTO userDTO, @PathVariable int id){
         if(authService.compareJwtToId(id, jwttoken)){
-            try {
-                return userService.updateUser(userDTO);
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
+            return userService.updateUser(userDTO);
         }
-        return 0;
+        return ResponseEntity.status(500).body("INTERNET_SERVER_ERROR: 유저 업데이트 중 에러가 발생했습니다.");
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@RequestHeader("Authorization") String jwttoken, @PathVariable int id){
+    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String jwttoken, @PathVariable int id){
         Integer idFromJwt = authService.getIdFromToken(jwttoken);
         if (idFromJwt!=id){
-            return;
+            return ResponseEntity.status(400).body("BAD_REQUEST: 본인이 아닌 유저의 회원정보 삭제는 불가능합니다.");
         }
-        userService.deleteUser(id);
+        return userService.deleteUser(id);
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam(value="userId") String userId, @RequestParam(value="password") String password){
-        try {
+    public ResponseEntity<String> login(@RequestParam(value="userId") String userId, @RequestParam(value="password") String password){
             return authService.loginAndJwtProvide(userId, password);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

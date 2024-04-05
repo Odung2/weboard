@@ -3,27 +3,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.weboard.mapper.PostMapper">
-    <select id="getPostById" parameterType="int" resultType="com.example.weboard.dto.PostDTO">
+    <select id="getPostById" parameterType="int" resultType="PostDTO">
         SELECT * FROM post WHERE post_id=#{postId}
     </select>
 
-    <select id="getPostAll" resultType="com.example.weboard.dto.PostDTO">
+    <select id="getPostAll" resultType="PostDTO">
         SELECT * FROM post
     </select>
 
-    <select id="getPostAllByOffset" parameterType="int" resultType="com.example.weboard.dto.PostDTO">
+    <select id="getPostAllByOffset" parameterType="int" resultType="PostDTO">
         SELECT * FROM post LIMIT 5
                  <if test="offset!=null">
                      OFFSET #{offset}
                  </if>
     </select>
 
-    <insert id="insertPost" parameterType="com.example.weboard.dto.PostDTO">
+    <insert id="insertPost" parameterType="PostDTO">
         INSERT INTO post (title, created_by, updated_by, updated_at, views, contents, file_path)
         VALUES (#{title}, #{createdBy}, null, null, #{views}, #{contents}, #{fileData});
     </insert>
 
-    <update id="updatePost" parameterType="com.example.weboard.dto.PostDTO">
+    <update id="updatePost" parameterType="PostDTO">
         UPDATE post
         <set>
             <if test="title != null">
