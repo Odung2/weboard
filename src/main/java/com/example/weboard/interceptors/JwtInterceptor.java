@@ -3,6 +3,7 @@ package com.example.weboard.interceptors;
 import com.example.weboard.service.AuthService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 
 public class JwtInterceptor implements HandlerInterceptor {
-
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -44,6 +44,9 @@ public class JwtInterceptor implements HandlerInterceptor {
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(jwtToken);
+            //서명 확인
+        } catch (SignatureException e) {
+            throw new RuntimeException("토큰의 서명이 올바르지 않습니다.");
         } catch (ExpiredJwtException e) {
             throw new RuntimeException("토큰이 만료되었습니다.");
         } catch (JwtException e) {
