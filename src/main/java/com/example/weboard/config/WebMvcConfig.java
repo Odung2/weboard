@@ -2,6 +2,7 @@ package com.example.weboard.config;
 
 import com.example.weboard.interceptors.JwtInterceptor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -9,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.theme.ThemeChangeInterceptor;
 
+@EnableJpaAuditing
 @Configuration
 public class WebMvcConfig  implements WebMvcConfigurer {
     private final long MAX_AGE_SECS=3600;

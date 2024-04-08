@@ -39,19 +39,11 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         String token = jwtToken.substring(7);
-        try {
-            Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(jwtToken);
-            //서명 확인
-        } catch (SignatureException e) {
-            throw new RuntimeException("토큰의 서명이 올바르지 않습니다.");
-        } catch (ExpiredJwtException e) {
-            throw new RuntimeException("토큰이 만료되었습니다.");
-        } catch (JwtException e) {
-            throw new MalformedJwtException("토큰이 유효하지 않습니다.");
-        }
+
+        Jws<Claims> claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(jwtToken);
 
         return true;
     }
