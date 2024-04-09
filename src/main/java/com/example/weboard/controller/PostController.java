@@ -1,9 +1,12 @@
 package com.example.weboard.controller;
 
+import com.example.weboard.dto.ApiResponse;
 import com.example.weboard.dto.PostDTO;
 import com.example.weboard.service.AuthService;
 import com.example.weboard.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +21,7 @@ public class PostController {
     private final AuthService authService;
 
     @GetMapping("/{postId}")
-    public PostDTO getPostById(@PathVariable int postId) {
+    public ResponseEntity<ApiResponse> getPostById(@PathVariable int postId) {
         return postService.getPostById(postId);
     }
 
@@ -27,28 +30,22 @@ public class PostController {
 //        return postService.getPostAll();
 //    }
     @GetMapping
-    public List<PostDTO> getPostAllByOffset(@RequestParam int offset) {
+    public ResponseEntity<ApiResponse> getPostAllByOffset(@RequestParam int offset) {
         return postService.getPostAllByOffset(offset);
     }
 
     @PostMapping
-    public void insertPost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") String jwttoken) {
-        Integer userId = authService.getIdFromToken(jwttoken);
-        postDTO.setCreatedBy(userId);
-        postService.insertPost(postDTO);
+    public ResponseEntity<ApiResponse> insertPost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") String jwttoken) {
+        return postService.insertPost(postDTO, jwttoken);
     }
 
     @PutMapping("/{postId}")
-    public void updatePost(@RequestHeader("Authorization") String jwttoken, @PathVariable int postId, @RequestBody PostDTO postDTO) {
-        postDTO.setPostId(postId);
-        Integer userId = authService.getIdFromToken(jwttoken);
-        postDTO.setUpdatedBy(userId);
-        postService.updatePost(postDTO);
+    public ResponseEntity<ApiResponse> updatePost(@RequestHeader("Authorization") String jwttoken, @PathVariable int postId, @RequestBody PostDTO postDTO) {
+        return postService.updatePost(postDTO, postId, jwttoken);
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@RequestHeader("Authorization") String jwttoken, @PathVariable int postId) {
-        //삭제 시 createdBy와 jwttoken의 Id가 동일한지 검증하는 로직 필요
-        postService.deletePost(postId);
+    public ResponseEntity<ApiResponse> deletePost(@RequestHeader("Authorization") String jwttoken, @PathVariable int postId) throws BadRequestException {
+        return postService.deletePost(postId, jwttoken);
     }
 }
