@@ -1,5 +1,6 @@
 package com.example.weboard.service;
 
+import com.example.weboard.dto.ApiResponse;
 import com.example.weboard.mapper.CommentMapper;
 import com.example.weboard.dto.CommentDTO;
 import lombok.RequiredArgsConstructor;
@@ -14,24 +15,29 @@ import java.util.List;
 public class CommentService {
 
     private final CommentMapper commentMapper;
-    public ResponseEntity<List<CommentDTO>> getCommentByPostId(int postId){
+    public ResponseEntity<ApiResponse> getCommentByPostId(int postId){
         List<CommentDTO> comments = commentMapper.getCommentByPostId(postId);
-        return ResponseEntity.status(200).body(comments);
+        ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글을 가져왔습니다.", comments);
+        return ResponseEntity.status(200).body(apiResponse);
     }
 
 
-    public ResponseEntity<String> insertComment(CommentDTO comment){
+    public ResponseEntity<ApiResponse> insertComment(CommentDTO comment){
         commentMapper.insertComment(comment);
-        return ResponseEntity.status(201).body("성공적으로 댓글이 추가 되었습니다.");
+        ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글이 추가 되었습니다.", null);
+        return ResponseEntity.status(201).body(apiResponse);
     }
 
-    public ResponseEntity<String> updateComment(CommentDTO comment){
+    public ResponseEntity<ApiResponse> updateComment(CommentDTO comment, int commentId){
+        comment.setCommentId(commentId);
         commentMapper.updateComment(comment);
-        return ResponseEntity.status(201).body("성공적으로 댓글이 수정되었습니다.");
+        ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글이 수정되었습니다.", null);
+        return ResponseEntity.status(201).body(apiResponse);
     }
 
-    public ResponseEntity<String> deleteComment(int commentId){
+    public ResponseEntity<ApiResponse> deleteComment(int commentId){
         commentMapper.deleteComment(commentId);
-        return ResponseEntity.status(200).body("성공적으로 댓글이 삭제되었습니다.");
+        ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글이 삭제되었습니다.", null);
+        return ResponseEntity.status(200).body(apiResponse);
     }
 }
