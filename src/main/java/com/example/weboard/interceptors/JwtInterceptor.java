@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -25,11 +26,9 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (request.getMethod().equals("GET")){
-            String requestURL = request.getRequestURL().toString();
-            if(requestURL.startsWith("http://localhost:8080/weboard/comments/")){
-                return true;
-            }
+        String requestURL = request.getRequestURL().toString();
+        if (request.getMethod().equals("GET") && requestURL.startsWith("http://localhost:8080/weboard/comments/") ){
+            return true;
         }
         String jwtToken = request.getHeader("Authorization");
 
@@ -44,6 +43,25 @@ public class JwtInterceptor implements HandlerInterceptor {
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(jwtToken);
+        int idFromJwt = Integer.parseInt(claims.getBody().getSubject());
+        if(requestURL.startsWith("http://localhost:8080/weboard/users/")){
+            String[] uriParts = requestURL.split("/");
+            int id = Integer.parseInt(uriParts[uriParts.length-1]);
+
+            if(idFromJwt!=id){ //로그인 유저와 요청 정보의 유저가 다른 사람일 경우
+                switch (request.getMethod()){
+                    case "GET":
+                        throw new BadRequestException("BAD_REQUEST: 본인이 아닌 유저의 정보를 확인할 수 없습니다.");
+                    case "PUT":
+                        throw new BadRequestException("BAD_REQUEST: 본인이 아닌 유저의 정보를 수정할 수 없습니다.");
+                    case "DELETE":
+                        throw new BadRequestException("BAD_REQUEST: 본인이 아닌 유저의 정보를 삭제할 수 없습니다.");
+                    default:
+                        break;
+                }
+            }
+
+        }
 
         return true;
     }

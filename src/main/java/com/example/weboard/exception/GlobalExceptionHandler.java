@@ -4,6 +4,7 @@ import com.example.weboard.dto.ApiResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,6 +34,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ApiResponse<Object>> handleJwtException(JwtException e){
         ApiResponse apiResponse = new ApiResponse(400, "토큰 처리 중 문제가 생겼습니다", null);
+        return ResponseEntity.status(400).body(apiResponse);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBadRequestException(BadRequestException e){
+        ApiResponse apiResponse = new ApiResponse(400, e.getMessage(), null);
         return ResponseEntity.status(400).body(apiResponse);
     }
 }

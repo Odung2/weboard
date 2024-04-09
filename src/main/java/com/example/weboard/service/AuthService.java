@@ -1,5 +1,6 @@
 package com.example.weboard.service;
 
+import com.example.weboard.dto.ApiResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +40,8 @@ public class AuthService {
         }
         return true;
     }
-    public ResponseEntity<String> loginAndJwtProvide(String userId, String password) { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
-        UserDTO user = userService.getUserByIdOrUserId(userId).getBody();
+    public ResponseEntity<ApiResponse> loginAndJwtProvide(String userId, String password) { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
+        UserDTO user = userService.getUserByIdOrUserId(userId).getBody().getData();
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다.");
         }
@@ -51,7 +52,8 @@ public class AuthService {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
         String token = generateJwtToken(user);
-        return ResponseEntity.status(200).body(token);
+        ApiResponse apiResponse = new ApiResponse(0, "성공적으로 로그인하였습니다.", token);
+        return ResponseEntity.status(200).body(apiResponse);
     }
 
     private String generateJwtToken(UserDTO user) {
