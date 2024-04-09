@@ -4,6 +4,7 @@ import com.example.weboard.dto.ApiResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.weboard.mapper.CommentMapper;
@@ -29,6 +30,7 @@ public class AuthService {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
+
 
     @Value("${jwt.expiration}")
     private int jwtExpirationMs;

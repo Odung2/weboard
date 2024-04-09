@@ -45,7 +45,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<ApiResponse> deletePost(@RequestHeader("Authorization") String jwttoken, @PathVariable int postId) throws BadRequestException {
+    public ResponseEntity<ApiResponse> deletePost(@RequestHeader(   "Authorization") String jwttoken, @PathVariable int postId) throws BadRequestException {
         return postService.deletePost(postId, jwttoken);
     }
 }

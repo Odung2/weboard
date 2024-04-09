@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -15,17 +16,23 @@ import org.springframework.web.servlet.HttpServletBean;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-
+@RequiredArgsConstructor
 public class JwtInterceptor implements HandlerInterceptor {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
+
+    public void setJwtSecret(String jwtSecret) {
+        this.jwtSecret = jwtSecret;
+    }
 
     @Value("${jwt.expiration}")
     private int jwtExpirationMs;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+//        setJwtSecret(jwt);  수정 필요... 왜 계속 secret key가 null이라고 뜨는 걸까?
         String requestURL = request.getRequestURL().toString();
         if (request.getMethod().equals("GET") && requestURL.startsWith("http://localhost:8080/weboard/comments/") ){
             return true;
