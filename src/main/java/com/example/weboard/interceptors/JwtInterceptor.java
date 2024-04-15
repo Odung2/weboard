@@ -10,21 +10,21 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HttpServletBean;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+@Component
 @RequiredArgsConstructor
 public class JwtInterceptor implements HandlerInterceptor {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
-
-    public void setJwtSecret(String jwtSecret) {
-        this.jwtSecret = jwtSecret;
-    }
 
     @Value("${jwt.expiration}")
     private int jwtExpirationMs;
@@ -49,7 +49,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         Jws<Claims> claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
-                .parseClaimsJws(jwtToken);
+                .parseClaimsJws(token);
         int idFromJwt = Integer.parseInt(claims.getBody().getSubject());
         if(requestURL.startsWith("http://localhost:8080/weboard/users/")){
             String[] uriParts = requestURL.split("/");

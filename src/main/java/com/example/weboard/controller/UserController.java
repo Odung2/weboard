@@ -32,7 +32,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateUser(@RequestHeader("Authorization") String jwttoken, @RequestBody UserDTO userDTO, @PathVariable int id){
-        return userService.updateUser(userDTO);
+        return userService.updateUser(userDTO, id);
     }
 
     @DeleteMapping("/{id}")

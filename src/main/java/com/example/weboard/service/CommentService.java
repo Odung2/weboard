@@ -15,6 +15,7 @@ import java.util.List;
 public class CommentService {
 
     private final CommentMapper commentMapper;
+    private final AuthService authService;
     public ResponseEntity<ApiResponse> getCommentByPostId(int postId){
         List<CommentDTO> comments = commentMapper.getCommentByPostId(postId);
         ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글을 가져왔습니다.", comments);
@@ -22,7 +23,11 @@ public class CommentService {
     }
 
 
-    public ResponseEntity<ApiResponse> insertComment(CommentDTO comment){
+    public ResponseEntity<ApiResponse> insertComment(CommentDTO comment, int postId, String jwttoken){
+        int id = authService.getIdFromToken(jwttoken);
+
+        comment.setPostId(postId);
+        comment.setUserId(id);
         commentMapper.insertComment(comment);
         ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글이 추가 되었습니다.", null);
         return ResponseEntity.status(201).body(apiResponse);

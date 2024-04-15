@@ -33,8 +33,8 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ApiResponse<Object>> handleJwtException(JwtException e){
-        ApiResponse apiResponse = new ApiResponse(400, "토큰 처리 중 문제가 생겼습니다", null);
-        return ResponseEntity.status(400).body(apiResponse);
+        ApiResponse apiResponse = new ApiResponse(500, "토큰 처리 중 문제가 생겼습니다", null);
+        return ResponseEntity.status(500).body(apiResponse);
     }
 
     @ExceptionHandler(BadRequestException.class)

@@ -46,7 +46,9 @@ public class UserService {
         return ResponseEntity.status(201).body(apiResponse);
     }
 
-    public ResponseEntity<ApiResponse> updateUser(UserDTO user) {
+    public ResponseEntity<ApiResponse> updateUser(UserDTO user, int id) {
+        user.setId(id);
+
         Integer count = 0;
         if(user.getUserId()!=null){
             count += 1;
@@ -64,6 +66,8 @@ public class UserService {
             user.setPassword(sha256Password);
         }
         user.setUpdatedAt(LocalDateTime.now());
+
+        userMapper.updateUser(user);
         String message = count.toString() + "개의 유저 속성이 업데이트 되었습니다.";
         ApiResponse apiResponse = new ApiResponse(0, message, user);
         return ResponseEntity.status(200).body(apiResponse);

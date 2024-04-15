@@ -22,18 +22,18 @@ public class CommentController {
         return commentService.getCommentByPostId(postId);
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse> insertComment(@RequestHeader("Authroization") String jwttoken, @RequestBody CommentDTO commentDTO){
-        return commentService.insertComment(commentDTO);
+    @PostMapping("/{postId}")
+    public ResponseEntity<ApiResponse> insertComment(@RequestHeader("Authorization") String jwttoken,@PathVariable int postId, @RequestBody CommentDTO commentDTO){
+        return commentService.insertComment(commentDTO, postId, jwttoken);
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<ApiResponse> updateComment(@RequestHeader("Authroization") String jwttoken, @PathVariable int commentId, @RequestBody CommentDTO commentDTO){
+    public ResponseEntity<ApiResponse> updateComment(@RequestHeader("Authorization") String jwttoken, @PathVariable int commentId, @RequestBody CommentDTO commentDTO){
         return commentService.updateComment(commentDTO, commentId);
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ApiResponse> deleteComment(@RequestHeader("Authroization") String jwttoken,  @PathVariable int commentId){
+    public ResponseEntity<ApiResponse> deleteComment(@RequestHeader("Authorization") String jwttoken,  @PathVariable int commentId){
         return commentService.deleteComment(commentId);
     }
 }

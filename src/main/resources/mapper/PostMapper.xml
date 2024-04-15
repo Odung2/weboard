@@ -29,7 +29,7 @@
             <if test="title != null">
                 title=#{title},
             </if>
-            <if test="updateBy != null">
+            <if test="updatedBy != null">
                 updated_by=#{updatedBy},
             </if>
             <if test="updatedAt != null">
@@ -38,7 +38,7 @@
             <if test="views != null">
                 views=#{views},
             </if>
-            <if test="contentText != null">
+            <if test="contents != null">
                 contents=#{contents},
             </if>
             <if test="fileData != null">

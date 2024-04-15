@@ -1,6 +1,7 @@
 package com.example.weboard.config;
 
 import com.example.weboard.interceptors.JwtInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpMethod;
@@ -12,8 +13,11 @@ import org.springframework.web.servlet.theme.ThemeChangeInterceptor;
 
 @EnableJpaAuditing
 @Configuration
+@RequiredArgsConstructor
 public class WebMvcConfig  implements WebMvcConfigurer {
     private final long MAX_AGE_SECS=3600;
+
+    private final JwtInterceptor jwtInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry){
@@ -27,7 +31,7 @@ public class WebMvcConfig  implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry){
-        registry.addInterceptor(new JwtInterceptor())
+        registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/weboard/**")
                 .excludePathPatterns("/weboard/users/signup")
                 .excludePathPatterns("/weboard/users/login")
