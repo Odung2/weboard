@@ -16,14 +16,22 @@ import java.util.List;
 public class PostService {
     private final PostMapper postMapper;
     private final AuthService authService;
-    public List<PostDTO> getPostAll() { return postMapper.getPostAll(); };
+    public List<PostDTO> getPostAll() { return postMapper.getPostAll(); }
 
     public ResponseEntity<ApiResponse> getPostAllByOffset(int offset) {
         ApiResponse apiResponse = new ApiResponse(0, "성공적으로 게시물을 가져왔습니다.", postMapper.getPostAllByOffset(offset));
         return ResponseEntity.status(200).body(apiResponse);
-    };
-    public ResponseEntity<ApiResponse> getPostById(int postId){
-        ApiResponse apiResponse = new ApiResponse(0, "성공적으로 게시물을 가져왔습니다.", postMapper.getPostById(postId));
+    }
+
+    /**
+     * 아이디로 게시글 상세 조회
+     *
+     * @param postId
+     * @return
+     */
+    public ResponseEntity<ApiResponse> getPostById(int postId){ //밑에
+        ApiResponse apiResponse = new ApiResponse(0, "성공적으로 게시물을 가져왔습니다.", postMapper.getPostById(postId)); // responseEntity 말고 commentService
+        //List<CommentDTO> 리스트, 오브젝트 두개를 담는 그릇.
         return ResponseEntity.status(200).body(apiResponse);
     }
 

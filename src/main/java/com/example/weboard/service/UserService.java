@@ -50,7 +50,7 @@ public class UserService {
         user.setId(id);
 
         Integer count = 0;
-        if(user.getUserId()!=null){
+        if(user.getUserId()!=null){ //변경 불가능
             count += 1;
         }
         if(user.getNickname()!=null){

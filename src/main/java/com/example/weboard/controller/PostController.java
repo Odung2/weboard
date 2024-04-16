@@ -25,10 +25,6 @@ public class PostController {
         return postService.getPostById(postId);
     }
 
-//    @GetMapping
-//    public List<PostDTO> getPostAll(){
-//        return postService.getPostAll();
-//    }
     @GetMapping
     public ResponseEntity<ApiResponse> getPostAllByOffset(@RequestParam int offset) {
         return postService.getPostAllByOffset(offset);

@@ -35,6 +35,6 @@ public class WebMvcConfig  implements WebMvcConfigurer {
                 .addPathPatterns("/weboard/**")
                 .excludePathPatterns("/weboard/users/signup")
                 .excludePathPatterns("/weboard/users/login")
-                .excludePathPatterns("/weboard/posts"); //모든 요청에 대해 Jwt token 유효성을 검사함 -> 수정 필요
+                .excludePathPatterns("/weboard/posts");
     }
 }

@@ -41,10 +41,15 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         if(jwtToken == null || !jwtToken.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP 401 Unauthorized
-            return false;
+//            return false;
+            throw new MalformedJwtException;
         }
-
-        String token = jwtToken.substring(7);
+        String token = "";
+        if(jwtToken.length() >= 7){ // 길이 체크 해야 함 StringIndexOutofBoundsException
+            token = jwtToken.substring(7);
+        }else{
+            throw new MalformedJwtException;
+        }
 
         Jws<Claims> claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
