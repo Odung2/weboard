@@ -12,18 +12,25 @@ public class BaseController {
         return new ResponseEntity<ApiResponse<T>>(resp, HttpStatus.OK);
     }
 
-    protected <T> ResponseEntity<ApiResponse<T>> ok(T body) {
+    protected <T> ResponseEntity<ApiResponse<T>> ok(T data) {
 
-        return responseEntity(FrkConstants.CD_OK, FrkConstants.SUCCESS, body);
+        return responseEntity(FrkConstants.CD_OK, FrkConstants.SUCCESS, data);
 
     }
 
-    protected <T> ResponseEntity<ApiResponse<T>> nok(int resultCode, String message, T body) {
-        return responseEntity(resultCode, message, body);
+    protected <T> ResponseEntity<ApiResponse<T>> ok(String message, T data) {
+
+        return responseEntity(FrkConstants.CD_OK, message, data);
+
     }
 
-    protected <T> ResponseEntity<ApiResponse<T>> nok(int resultCode, T body) {
-        return nok(resultCode, FrkConstants.FAIL, body);
+
+    protected <T> ResponseEntity<ApiResponse<T>> nok(int resultCode, String message, T data) {
+        return responseEntity(resultCode, message, data);
+    }
+
+    protected <T> ResponseEntity<ApiResponse<T>> nok(int resultCode, T data) {
+        return nok(resultCode, FrkConstants.FAIL, data);
     }
 
     protected ResponseEntity<ApiResponse<Void>> ok() {

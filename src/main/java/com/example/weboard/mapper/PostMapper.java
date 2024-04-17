@@ -13,9 +13,9 @@ public interface PostMapper extends BaseMapper {
     List<PostDTO> getPostAll();
     List<PostDTO> getPostAllByOffset(int offset);
     @Override
-    void insert(PostDTO post);
+    int insert(PostDTO post);
     @Override
-    void update(PostDTO post);
+    int update(PostDTO post);
     @Override
-    void delete(int postId);
+    int delete(int postId);
 }

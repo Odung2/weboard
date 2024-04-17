@@ -6,14 +6,14 @@ import com.example.weboard.dto.UserDTO;
 
 public interface BaseMapper {
 
-    void insert(UserDTO user);
-    void insert(PostDTO post);
-    void insert(CommentDTO comment);
+    int insert(UserDTO user);
+    int insert(PostDTO post);
+    int insert(CommentDTO comment);
 
-    void update(UserDTO user);
-    void update(PostDTO post);
-    void update(CommentDTO comment);
+    int update(UserDTO user);
+    int update(PostDTO post);
+    int update(CommentDTO comment);
 
-    void delete(int DTOId);
+    int delete(int DTOId);
 
 }

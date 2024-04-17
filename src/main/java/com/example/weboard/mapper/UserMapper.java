@@ -12,11 +12,11 @@ public interface UserMapper extends BaseMapper{
 
     String getPasswordById(int id);
     @Override
-    void insert(UserDTO user);
+    int insert(UserDTO user);
     @Override
-    void update(UserDTO user);
+    int update(UserDTO user);
     @Override
-    void delete(int id);
+    int delete(int id);
 
 
 }

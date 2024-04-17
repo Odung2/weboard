@@ -10,9 +10,9 @@ public interface CommentMapper extends BaseMapper{
     List<CommentDTO> getCommentByPostId(int postId);
 
     @Override
-    void insert(CommentDTO comment);
+    int insert(CommentDTO comment);
     @Override
-    void update(CommentDTO comment);
+    int update(CommentDTO comment);
     @Override
-    void delete(int commentId);
+    int delete(int commentId);
 }
