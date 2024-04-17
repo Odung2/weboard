@@ -28,20 +28,20 @@ public class CommentService {
 
         comment.setPostId(postId);
         comment.setUserId(id);
-        commentMapper.insertComment(comment);
+        commentMapper.insert(comment);
         ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글이 추가 되었습니다.", null);
         return ResponseEntity.status(201).body(apiResponse);
     }
 
     public ResponseEntity<ApiResponse> updateComment(CommentDTO comment, int commentId){
         comment.setCommentId(commentId);
-        commentMapper.updateComment(comment);
+        commentMapper.update(comment);
         ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글이 수정되었습니다.", null);
         return ResponseEntity.status(201).body(apiResponse);
     }
 
     public ResponseEntity<ApiResponse> deleteComment(int commentId){
-        commentMapper.deleteComment(commentId);
+        commentMapper.delete(commentId);
         ApiResponse apiResponse = new ApiResponse<>(0, "성공적으로 댓글이 삭제되었습니다.", null);
         return ResponseEntity.status(200).body(apiResponse);
     }

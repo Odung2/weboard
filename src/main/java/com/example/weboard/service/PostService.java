@@ -38,7 +38,7 @@ public class PostService {
     public ResponseEntity<ApiResponse> insertPost(PostDTO post, String jwttoken){
         Integer userId = authService.getIdFromToken(jwttoken);
         post.setCreatedBy(userId);
-        postMapper.insertPost(post);
+        postMapper.insert(post);
         ApiResponse apiResponse = new ApiResponse(0, "성공적으로 게시물을 작성했습니다.", null);
         return ResponseEntity.status(201).body(apiResponse);
     }
@@ -47,7 +47,7 @@ public class PostService {
         post.setPostId(postId);
         Integer userId = authService.getIdFromToken(jwttoken);
         post.setUpdatedBy(userId);
-        postMapper.updatePost(post);
+        postMapper.update(post);
         ApiResponse apiResponse = new ApiResponse(0, "성공적으로 게시물을 수정했습니다.", null);
         return ResponseEntity.status(200).body(apiResponse);
     }
@@ -58,7 +58,7 @@ public class PostService {
         if(idFromJwt!=createdById){
             throw new BadRequestException("타인의 댓글은 삭제할 수 없습니다.");
         }
-        postMapper.deletePost(postId);
+        postMapper.delete(postId);
         ApiResponse apiResponse = new ApiResponse(0, "성공적으로 게시물을 삭제했습니다.", null);
         return ResponseEntity.status(200).body(apiResponse);
     }

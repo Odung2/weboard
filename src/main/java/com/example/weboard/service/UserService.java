@@ -41,7 +41,7 @@ public class UserService {
         String plainPassword = user.getPassword();
         String sha256Password = plainToSha256(plainPassword);
         user.setPassword(sha256Password);
-        userMapper.insertUser(user);
+        userMapper.insert(user);
         ApiResponse apiResponse = new ApiResponse(0, "성공적으로 유저가 생성되었습니다.", user);
         return ResponseEntity.status(201).body(apiResponse);
     }
@@ -67,14 +67,14 @@ public class UserService {
         }
         user.setUpdatedAt(LocalDateTime.now());
 
-        userMapper.updateUser(user);
+        userMapper.update(user);
         String message = count.toString() + "개의 유저 속성이 업데이트 되었습니다.";
         ApiResponse apiResponse = new ApiResponse(0, message, user);
         return ResponseEntity.status(200).body(apiResponse);
     }
 
     public ResponseEntity<ApiResponse> deleteUser(int id){
-        userMapper.deleteUser(id);
+        userMapper.delete(id);
         ApiResponse apiResponse = new ApiResponse(0, "성공적으로 유저 정보가 삭제되었습니다.", null);
         return ResponseEntity.status(200).body(apiResponse);
     }

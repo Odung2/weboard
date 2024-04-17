@@ -29,12 +29,12 @@
         SELECT password FROM user WHERE id = #{id}
     </select>
 
-    <insert id="insertUser" parameterType="com.example.weboard.dto.UserDTO">
+    <insert id="insert" parameterType="com.example.weboard.dto.UserDTO">
         INSERT INTO user (user_id, nickname, password, updated_by, updated_at)
         VALUES (#{userId}, #{nickname}, #{password}, null, null)
     </insert>
 
-    <update id="updateUser" parameterType="com.example.weboard.dto.UserDTO">
+    <update id="update" parameterType="com.example.weboard.dto.UserDTO">
         UPDATE user
         <set>
             <if test="userId != null">
@@ -57,7 +57,7 @@
     </update>
 
 
-    <delete id="deleteUser" parameterType="int">
+    <delete id="delete" parameterType="int">
         DELETE FROM user
             WHERE id = #{id}
     </delete>

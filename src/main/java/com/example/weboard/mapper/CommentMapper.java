@@ -6,11 +6,13 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface CommentMapper {
+public interface CommentMapper extends BaseMapper{
     List<CommentDTO> getCommentByPostId(int postId);
-    void insertComment(CommentDTO comment);
 
-    void updateComment(CommentDTO comment);
-
-    void deleteComment(int commentId);
+    @Override
+    void insert(CommentDTO comment);
+    @Override
+    void update(CommentDTO comment);
+    @Override
+    void delete(int commentId);
 }

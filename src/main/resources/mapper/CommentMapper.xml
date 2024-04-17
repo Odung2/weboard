@@ -8,12 +8,12 @@
         SELECT * FROM comment WHERE post_id=#{postId}
     </select>
 
-    <insert id="insertComment" parameterType="com.example.weboard.dto.CommentDTO">
+    <insert id="insert" parameterType="com.example.weboard.dto.CommentDTO">
         INSERT INTO comment (post_id, user_id, comment_text, created_by, updated_by, updated_at)
         VALUES ( #{postId}, #{userId}, #{commentText}, #{userId}, null, null)
     </insert>
 
-    <update id="updateComment" parameterType="com.example.weboard.dto.CommentDTO">
+    <update id="update" parameterType="com.example.weboard.dto.CommentDTO">
         UPDATE comment
         <set>
             <if test="commentText != null">
@@ -29,7 +29,7 @@
             WHERE comment_id=#{commentId}
     </update>
 
-    <delete id="deleteComment" parameterType="int">
+    <delete id="delete" parameterType="int">
         DELETE FROM comment
             WHERE comment_id=#{commentId}
     </delete>
