@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,31 @@ public class UserService {
 
     public String getPasswordById(int id) {
         return userMapper.getPasswordById(id);
+    }
+
+    public int addLoginFailCount(UserDTO param){
+        userMapper.addLoginFailCount(param.getId());
+        UserDTO user = userMapper.getUserByIdOrUserId(param);
+        return user.getLoginFail();
+    }
+
+    public int resetLoginFailCountAndLoginLocked(UserDTO param){
+        int id = param.getId();
+        userMapper.resetLoginFailCount(id);
+        userMapper.resetLoginLocked(id);
+        UserDTO user = userMapper.getUserByIdOrUserId(param);
+        return user.getLoginFail();
+    }
+
+    public int lockUnlockUser(int id, int isLocked){
+        //만약 lockUser==1: lockUser 실행, lockUser==0: unlockUser 실행
+        // usermapper 인자 UserDTO, isLocked만 수정해서 ㄱㄱ
+        return userMapper.lockUnlockUser(id, isLocked);
+    }
+
+    public int updateLoginLock(UserDTO user){
+        user.setLoginLocked(new Date()); //@lastModifiedDate 어노테이션이 제대로 작동하지 않음...
+        return userMapper.updateLoginLocked(user);
     }
 
     public UserDTO insertUser(UserDTO user) {
@@ -84,10 +110,7 @@ public class UserService {
             }
             hexString.append(hex);
         }
-
         return hexString.toString();
     }
-
-
 
 }

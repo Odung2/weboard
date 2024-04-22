@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data //getter, setter, required...을 한꺼번에 설정해주는 유용한 어노테이션
 @NoArgsConstructor // paramenters 없는 기본 생성자를 생성해줌...
@@ -28,5 +29,18 @@ public class UserDTO {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @LastModifiedDate
+    private Date lastLogin;
+
+    private int loginFail;
+
+    private int isLocked;
+
+    @LastModifiedDate
+    private Date lastPwUpdated;
+
+    @LastModifiedDate
+    private Date loginLocked;
 }
 

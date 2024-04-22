@@ -2,6 +2,7 @@ package com.example.weboard.controller;
 
 import com.example.weboard.dto.ApiResponse;
 import com.example.weboard.dto.FrkConstants;
+import com.example.weboard.dto.TokensDTO;
 import com.example.weboard.dto.UserDTO;
 import com.example.weboard.service.AuthService;
 import com.example.weboard.service.UserService;
@@ -39,7 +40,7 @@ public class UserController extends BaseController{
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<String>> login(@RequestParam(value="userId") String userId, @RequestParam(value="password") String password){
+    public ResponseEntity<ApiResponse<TokensDTO>> login(@RequestParam(value="userId") String userId, @RequestParam(value="password") String password) throws Exception {
             return ok(FrkConstants.successLogin, authService.loginAndJwtProvide(userId, password));
     }
 

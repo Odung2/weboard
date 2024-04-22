@@ -29,12 +29,12 @@
         SELECT password FROM user WHERE id = #{id}
     </select>
 
-    <insert id="insert" parameterType="com.example.weboard.dto.UserDTO">
+    <insert id="insert" parameterType="UserDTO">
         INSERT INTO user (user_id, nickname, password, updated_by, updated_at)
         VALUES (#{userId}, #{nickname}, #{password}, null, null)
     </insert>
 
-    <update id="update" parameterType="com.example.weboard.dto.UserDTO">
+    <update id="update" parameterType="UserDTO">
         UPDATE user
         <set>
             <if test="userId != null">
@@ -61,5 +61,45 @@
         DELETE FROM user
             WHERE id = #{id}
     </delete>
+
+    <update id="addLoginFailCount" parameterType="int">
+        UPDATE user
+        <set>
+            login_fail = user.login_fail +1
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="resetLoginFailCount" parameterType="int">
+        UPDATE user
+        <set>
+            login_fail = 0
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="lockUnlockUser" parameterType="int">
+        UPDATE user
+        <set>
+            is_locked = #{isLocked}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLoginLocked" parameterType="UserDTO">
+        UPDATE user
+        <set>
+            login_locked = #{loginLocked}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="resetLoginLocked" parameterType="int">
+        UPDATE user
+        <set>
+            login_locked = null
+        </set>
+        WHERE id = #{id}
+    </update>
 
 </mapper>

@@ -4,7 +4,6 @@ import com.example.weboard.dto.ApiResponse;
 import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.dto.PostDTO;
 import com.example.weboard.dto.PostViewBO;
-import com.example.weboard.service.AuthService;
 import com.example.weboard.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -19,7 +18,6 @@ import java.util.List;
 public class PostController extends BaseController{
 
     private final PostService postService;
-    private final AuthService authService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<PostDTO>>> getPostAllByOffset(

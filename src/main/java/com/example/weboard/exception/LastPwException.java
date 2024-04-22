@@ -1,0 +1,17 @@
+package com.example.weboard.exception;
+
+public class LastPwException extends Exception{
+    public LastPwException(){}
+
+    public LastPwException(String message){
+        super(message);
+    }
+
+    public LastPwException(Throwable throwable){
+        super(throwable);
+    }
+
+    public LastPwException(String message, Throwable throwable){
+        super(message, throwable);
+    }
+}
