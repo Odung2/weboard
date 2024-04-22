@@ -1,5 +1,6 @@
 package com.example.weboard.interceptors;
 
+import com.example.weboard.exception.GenerateNewAccessJWTException;
 import com.example.weboard.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 @RequiredArgsConstructor
@@ -31,8 +33,15 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         String accessJWT = request.getHeader("Authorization");
-
-        authService.checkJWTValid(accessJWT);
+        String refreshJWT = request.getHeader("Refresh-token");
+        if(refreshJWT==null || refreshJWT.isEmpty()){
+            authService.checkJWTValid(accessJWT);
+        }else{
+            String newAccessToken=authService.checkJWTValid(accessJWT, refreshJWT);
+            if (newAccessToken != null && !newAccessToken.isEmpty()) {
+                throw new GenerateNewAccessJWTException(authService.checkJWTValid(accessJWT, refreshJWT)); // 새로 access token 발급 됨
+            }
+        }
         int idFromJwt = authService.getIdFromToken(accessJWT);
 
         if(requestURL.startsWith("http://localhost:8080/weboard/users/")){

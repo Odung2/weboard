@@ -7,6 +7,7 @@ import com.example.weboard.exception.*;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Expr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class AuthService {
     @Value("${jwt.access-expiration}")
     private int accessJWTExpirationMs;
 
-    @Value("${jwt.refresh-expiration")
+    @Value("${jwt.refresh-expiration}")
     private int refreshJWTExpirationMs;
 
     public Boolean compareJwtToId(int id, String JWT){
@@ -74,11 +75,56 @@ public class AuthService {
         return IssuedTokens;
     }
 
-    public void checkJWTValid(String JWT){
-        if(JWT == null || !JWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
+    public void checkJWTValid(String accessJWT){
+        if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
             throw new MalformedJwtException("");
         }
+        String jwtToken = accessJWT.substring(7);
+        try {
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(jwtToken);
+
+        } catch (ExpiredJwtException e) {
+            throw new RuntimeException("토큰이 만료되었습니다.");
+        }
     }
+
+    public String checkJWTValid(String accessJWT, String refreshJWT) throws RuntimeException {
+        if(accessJWT == null || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
+            throw new MalformedJwtException("");
+        }
+        accessJWT = accessJWT.substring(7);
+        Jws<Claims> accessClaims;
+        refreshJWT = refreshJWT.substring(7);
+        int id=0;
+        StringBuilder userId = new StringBuilder();
+        try {
+            accessClaims = extractJWTClaims(accessJWT);
+            // refresh token 유효성 확인 -> access token 재발급
+            id = Integer.parseInt(accessClaims.getBody().getSubject());
+            userId.append(accessClaims.getBody().get("userId", String.class)) ;
+        } catch (ExpiredJwtException e) {
+            try {
+                extractJWTClaims(refreshJWT);
+            } catch (ExpiredJwtException e1) {
+                 // 예외 메시지 추가
+                throw new MalformedJwtException("refresh token도 만료되었습니다. 다시 로그인 해주세요.");
+            } catch (MalformedJwtException e2) {
+//                throw new MalformedJwtException("토큰 처리 중? 문제가 발생했습니다.");
+                return generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
+            } catch (ClaimJwtException e3) {
+                throw new MalformedJwtException("claim jwt exception");
+            }
+            // refresh token 유효성 확인 -> access token 재발급
+            return generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
+        }
+        return "";
+    }
+
+
+
     private String generateAccessJWT(UserDTO user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessJWTExpirationMs);
@@ -92,11 +138,25 @@ public class AuthService {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
+    private String generateAccessJWT(int id, String userId) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + accessJWTExpirationMs);
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(id))
+                .claim("userId", userId)
+                .claim("type", "access")
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+                .compact();
+    }
     private String generateRefreshJWT(UserDTO user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshJWTExpirationMs);
 
         return Jwts.builder()
+                .setSubject("weboard")
                 .claim("type", "refresh")
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
@@ -104,6 +164,13 @@ public class AuthService {
                 .compact();
     }
 
+    public Jws<Claims> extractJWTClaims(String BearerJWT){
+
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(BearerJWT);
+    }
 
     public Integer getIdFromToken(String JWT) {
         if (JWT == null || !JWT.startsWith("Bearer ")) {

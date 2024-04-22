@@ -34,7 +34,7 @@ public class GlobalExceptionHandler extends BaseController {
     public ResponseEntity<ApiResponse<Object>> handleMalformedJwtException (MalformedJwtException e){
 //        ApiResponse apiResponse = new ApiResponse(400, "토큰의 형식이 올바르지 않습니다", null);
 //        return ResponseEntity.status(400).body(apiResponse);
-        return nok(400, "토큰의 형식이 올바르지 않습니다", null);
+        return nok(400, e.getMessage(), null);
     }
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ApiResponse<Object>> handleJwtException(JwtException e){
@@ -76,6 +76,12 @@ public class GlobalExceptionHandler extends BaseController {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Object>> handleRuntimeException(RuntimeException e){
         return nok(500, e.getMessage(), null);
+    }
+
+    @ExceptionHandler(GenerateNewAccessJWTException.class)
+    public ResponseEntity<ApiResponse<Object>> handleGenerateNewAccessJWTException(GenerateNewAccessJWTException e){
+        //e.getMessage()는 access token
+        return nok(500,"발급한 새 Access 토큰으로 접속해주세요." , e.getMessage());
     }
 
 }
