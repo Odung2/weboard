@@ -4,6 +4,59 @@ Java + Spring boot Framework로 만든 게시판 backend입니다.
 DB 구성
 
 user / post / comment
+| user  | CREATE TABLE `user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(20) DEFAULT NULL,
+  `nickname` varchar(30) DEFAULT NULL,
+  `password` varchar(200) DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_by` int DEFAULT NULL,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_login` datetime DEFAULT CURRENT_TIMESTAMP,
+  `login_fail` int DEFAULT '0',
+  `is_locked` int DEFAULT '0',
+  `last_pw_updated` datetime DEFAULT CURRENT_TIMESTAMP,
+  `login_locked` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_defined_id` (`user_id`),
+  KEY `updated_by` (`updated_by`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb3 |
+
+| post  | CREATE TABLE `post` (
+  `post_id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_by` int DEFAULT NULL,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `views` int DEFAULT NULL,
+  `contents` mediumtext,
+  `file_path` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`post_id`),
+  KEY `created_by` (`created_by`),
+  KEY `updated_by` (`updated_by`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3 |
+
+| comment | CREATE TABLE `comment` (
+  `comment_id` int NOT NULL AUTO_INCREMENT,
+  `post_id` int DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  `comment_text` varchar(500) DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_by` int DEFAULT NULL,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`comment_id`),
+  KEY `post_id` (`post_id`),
+  KEY `created_by` (`created_by`),
+  KEY `updated_by` (`updated_by`),
+  KEY `comment_ibfk_2` (`user_id`),
+  CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`),
+  CONSTRAINT `comment_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `comment_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`),
+  CONSTRAINT `comment_ibfk_4` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3 |
+
 
 ## 기능
 
