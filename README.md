@@ -1,12 +1,12 @@
 # weboard Java로 만든 간단한 게시판 backend
 Java + Spring boot Framework로 만든 게시판 backend입니다.
 
-DB 구성
+### DB 구성
 
-user / post / comment
+#### user / post / comment
 
 
-| user  | CREATE TABLE `user` (
+#### | user  | CREATE TABLE `user` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` varchar(20) DEFAULT NULL,
   `nickname` varchar(30) DEFAULT NULL,
@@ -24,7 +24,7 @@ user / post / comment
   KEY `updated_by` (`updated_by`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb3 |
 
-| post  | CREATE TABLE `post` (
+#### | post  | CREATE TABLE `post` (
   `post_id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL,
   `created_by` int DEFAULT NULL,
@@ -39,7 +39,7 @@ user / post / comment
   KEY `updated_by` (`updated_by`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3 |
 
-| comment | CREATE TABLE `comment` (
+#### | comment | CREATE TABLE `comment` (
   `comment_id` int NOT NULL AUTO_INCREMENT,
   `post_id` int DEFAULT NULL,
   `user_id` int DEFAULT NULL,
