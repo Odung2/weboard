@@ -4,6 +4,8 @@ Java + Spring boot Framework로 만든 게시판 backend입니다.
 DB 구성
 
 user / post / comment
+
+
 | user  | CREATE TABLE `user` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` varchar(20) DEFAULT NULL,
