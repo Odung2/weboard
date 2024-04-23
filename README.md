@@ -1,7 +1,10 @@
 # weboard Java로 만든 간단한 게시판 backend
 Java + Spring boot Framework로 만든 게시판 backend입니다.
+
 DB 구성
+
 user / post / comment
+
 ## 기능
 
 ### User
@@ -23,25 +26,29 @@ user는 본인의 계정 정보를 삭제할 수 있습니다.
 각 게시글 및 게시글에 달린 댓글을 조회가능합니다.
 #### 3. 포스트 작성([post] weboard/posts)
 로그인 후 게시글을 작성할 수 있습니다.
-#### 4. 포스트 수정([post] weboard/posts/{postId})
+#### 4. 포스트 수정([put] weboard/posts/{postId})
 로그인 후 본인이 작성한 게시글을 수정할 수 있습니다.
 #### 5. 포스트 삭제([del] weboard/posts/{postId})
 로그인 후 본인이 작성한 게시글을 삭제할 수 있습니다.
 
 ### Comment
-#### 1. 댓글 작성(comments/{postId})
+#### 1. 댓글 작성([post] comments/{postId})
 로그인 후 게시글에 댓글을 작성할 수 있습니다.
-#### 2. 댓글 수정(comments/{commentId})
+#### 2. 댓글 수정([put] comments/{commentId})
 로그인 후 본인이 작성한 댓글을 수정할 수 있습니다.
-#### 3. 댓글 삭제(comments/{commentId})
+#### 3. 댓글 삭제([del] comments/{commentId})
 로그인 후 본인이 작성한 댓글을 삭제할 수 있습니다.
 
 ### Security
 #### OAuth 2.0
 로그인 시 Access token 및 Refresh token을 발급합니다.
+
 로그인 후 가능한 활동들은 Access token으로 Authentication이 이루어집니다.
+
 Access token이 만료된 후에, Refresh token이 유효하다면 다시 Access token을 발급합니다.
+
 만약 Refresh token도 만료되었다면 다시 로그인 하여 Access token 및 Refresh token을 새로 발급받아야 합니다.
+
 
 #### 비밀번호 검사
 1. 비밀번호는 8~16자리로 이루어져야 합니다.
