@@ -203,21 +203,7 @@ public class AuthService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean checkNewPwValid(String password) throws Exception{
-        if(password.length()<8){
-            throw new ShortPasswordException();
-        }
-        if(password.length()<12){
-            if(!Pattern.matches(FrkConstants.passwordRegexUnder12, password)){
-                throw new PasswordRegexException("12자 미만의 경우 영문 대문자, 소문자, 숫자, 특수문자의 조합으로 입력해주세요.");
-            }
-            return true;
-        }
-        if(!Pattern.matches(FrkConstants.passwordRegex12orMore, password)){
-            throw new PasswordRegexException("12자 이상의 경우 영문 대/소문자, 숫자, 특수문자의 조합으로 입력해주세요.");
-        }
-        return true;
-    }
+
 
     public boolean checkLastLoginAndLastPwUpdatedAndLock(int id) throws Exception{
         UserDTO user = userService.getUserByIdOrUserId(id);

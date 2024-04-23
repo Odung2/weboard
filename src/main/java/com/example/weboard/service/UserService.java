@@ -1,5 +1,8 @@
 package com.example.weboard.service;
 
+import com.example.weboard.dto.FrkConstants;
+import com.example.weboard.exception.PasswordRegexException;
+import com.example.weboard.exception.ShortPasswordException;
 import com.example.weboard.mapper.UserMapper;
 import com.example.weboard.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -56,11 +60,13 @@ public class UserService {
         return userMapper.updateLoginLocked(user);
     }
 
-    public UserDTO insertUser(UserDTO user) {
+    public UserDTO insertUser(UserDTO user) throws Exception {
         String plainPassword = user.getPassword();
-        String sha256Password = plainToSha256(plainPassword);
-        user.setPassword(sha256Password);
-        userMapper.insert(user);
+        if(checkNewPwValid(plainPassword)){
+            String sha256Password = plainToSha256(plainPassword);
+            user.setPassword(sha256Password);
+            userMapper.insert(user);
+        };
         return user;
     }
 
@@ -111,6 +117,22 @@ public class UserService {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    public boolean checkNewPwValid(String password) throws Exception{
+        if(password.length()<8){
+            throw new ShortPasswordException();
+        }
+        if(password.length()<12){
+            if(!Pattern.matches(FrkConstants.passwordRegexUnder12, password)){
+                throw new PasswordRegexException("12자 미만의 경우 영문 대문자, 소문자, 숫자, 특수문자의 조합으로 입력해주세요.");
+            }
+            return true;
+        }
+        if(!Pattern.matches(FrkConstants.passwordRegex12orMore, password)){
+            throw new PasswordRegexException("12자 이상의 경우 영문 대/소문자, 숫자, 특수문자의 조합으로 입력해주세요.");
+        }
+        return true;
     }
 
 }

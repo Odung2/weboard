@@ -25,7 +25,7 @@ public class UserController extends BaseController{
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<UserDTO>> insertUser(@RequestBody UserDTO userDTO){
+    public ResponseEntity<ApiResponse<UserDTO>> insertUser(@RequestBody UserDTO userDTO) throws Exception {
         return ok(FrkConstants.insertUser, userService.insertUser(userDTO));
     }
 
