@@ -35,6 +35,14 @@ public class AuthService {
         int idFromJwt = getIdFromToken(JWT);
         return idFromJwt == id;
     }
+
+    /**
+     * 로그인 검사
+     * @param userId
+     * @param password
+     * @return
+     * @throws Exception
+     */
     public TokensDTO loginAndJwtProvide(String userId, String password) throws Exception { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
         UserDTO user = userService.getUserByIdOrUserId(userId);
         if (user == null) {
@@ -45,7 +53,7 @@ public class AuthService {
         String storedPassword = user.getPassword();
         String hashedPassword = userService.plainToSha256(password);
 
-        boolean valid = checkLastLoginAndLastPwUpdatedAndLock(id);
+        boolean valid = checkLastLoginAndLoginTrialMoreThan5(id);
 
         if (!storedPassword.equals(hashedPassword)) {
             int failCount = userService.addLoginFailCount(user);
@@ -75,6 +83,10 @@ public class AuthService {
         return IssuedTokens;
     }
 
+    /**
+     * access token valid 검사
+     * @param accessJWT
+     */
     public void checkJWTValid(String accessJWT){
         if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
             throw new MalformedJwtException("");
@@ -91,6 +103,14 @@ public class AuthService {
         }
     }
 
+    /**
+     * access & refresh token valid 검사
+     * 만약 access token이 만료되고, refresh token이 유효하다면 새 accessJWT를 발급받아 반환한다.
+     * @param accessJWT
+     * @param refreshJWT
+     * @return newAccessJWT
+     * @throws RuntimeException
+     */
     public String checkJWTValid(String accessJWT, String refreshJWT) throws RuntimeException {
         if(accessJWT == null || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
             throw new MalformedJwtException("");
@@ -130,7 +150,12 @@ public class AuthService {
     }
 
 
-
+    /**
+     * access token을 발급한다.
+     * access token은 id, userId의 정보가 포함되어 있다.
+     * @param user
+     * @return
+     */
     private String generateAccessJWT(UserDTO user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessJWTExpirationMs);
@@ -157,6 +182,13 @@ public class AuthService {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
+
+    /**
+     * refresh token을 발급한다.
+     * refresh token은 유저의 정보가 담겨있지 않다.
+     * @param user
+     * @return
+     */
     private String generateRefreshJWT(UserDTO user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshJWTExpirationMs);
@@ -170,6 +202,11 @@ public class AuthService {
                 .compact();
     }
 
+    /**
+     * JWT의 claim을 추출한다.
+     * @param BearerJWT
+     * @return JWTClaims
+     */
     public Jws<Claims> extractJWTClaims(String BearerJWT){
 
         return Jwts.parserBuilder()
@@ -178,18 +215,18 @@ public class AuthService {
                 .parseClaimsJws(BearerJWT);
     }
 
+    /**
+     * JWT로부터 id를 추출한다.
+     * @param JWT
+     * @return
+     */
     public Integer getIdFromToken(String JWT) {
         if (JWT == null || !JWT.startsWith("Bearer ")) {
             throw new IllegalArgumentException("토큰이 없거나 유효하지 않습니다.");
         }
         String jwtToken = JWT.substring(7);
         try {
-            Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(jwtToken);
-
-            return Integer.parseInt(claims.getBody().getSubject());
+            return Integer.parseInt(extractJWTClaims(JWT).getBody().getSubject());
         } catch (ExpiredJwtException e) {
             throw new RuntimeException("토큰이 만료되었습니다.");
         } catch (JwtException e) {
@@ -204,8 +241,13 @@ public class AuthService {
     }
 
 
-
-    public boolean checkLastLoginAndLastPwUpdatedAndLock(int id) throws Exception{
+    /**
+     * 마지막 로그인이 1개월 이전인지, 로그인이 5회이상 틀렸는지 확인한다.
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public boolean checkLastLoginAndLoginTrialMoreThan5(int id) throws Exception{
         UserDTO user = userService.getUserByIdOrUserId(id);
         Date currentDate = new Date();
 
