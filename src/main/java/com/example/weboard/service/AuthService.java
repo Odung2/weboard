@@ -97,28 +97,34 @@ public class AuthService {
         }
         accessJWT = accessJWT.substring(7);
         Jws<Claims> accessClaims;
-        refreshJWT = refreshJWT.substring(7);
+//        refreshJWT = refreshJWT.substring(7);
         int id=0;
         StringBuilder userId = new StringBuilder();
         try {
-            accessClaims = extractJWTClaims(accessJWT);
+            extractJWTClaims(accessJWT);
             // refresh token 유효성 확인 -> access token 재발급
-            id = Integer.parseInt(accessClaims.getBody().getSubject());
-            userId.append(accessClaims.getBody().get("userId", String.class)) ;
+
         } catch (ExpiredJwtException e) {
             try {
-                extractJWTClaims(refreshJWT);
+                if((redisService.getValues(accessJWT)).equals(refreshJWT)){
+
+                    extractJWTClaims(refreshJWT);
+                    id = Integer.parseInt(e.getClaims().getSubject());
+                    userId.append(e.getClaims().get("userId", String.class));
+                }else{
+                    throw new MalformedJwtException("access token과 refresh token이 일치하지 않습니다.");
+                }
             } catch (ExpiredJwtException e1) {
                  // 예외 메시지 추가
                 throw new MalformedJwtException("refresh token도 만료되었습니다. 다시 로그인 해주세요.");
-            } catch (MalformedJwtException e2) {
-//                throw new MalformedJwtException("토큰 처리 중? 문제가 발생했습니다.");
-                return generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
             } catch (ClaimJwtException e3) {
                 throw new MalformedJwtException("claim jwt exception");
             }
             // refresh token 유효성 확인 -> access token 재발급
-            return generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
+            redisService.deleteValues(accessJWT);
+            String newAccessJWT = generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
+            redisService.setValues(newAccessJWT, refreshJWT);
+            return newAccessJWT;
         }
         return "";
     }

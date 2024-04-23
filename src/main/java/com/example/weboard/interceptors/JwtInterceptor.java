@@ -39,7 +39,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         }else{
             String newAccessToken=authService.checkJWTValid(accessJWT, refreshJWT);
             if (newAccessToken != null && !newAccessToken.isEmpty()) {
-                throw new GenerateNewAccessJWTException(authService.checkJWTValid(accessJWT, refreshJWT)); // 새로 access token 발급 됨
+                throw new GenerateNewAccessJWTException(newAccessToken); // 새로 access token 발급 됨
             }
         }
         int idFromJwt = authService.getIdFromToken(accessJWT);
