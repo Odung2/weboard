@@ -5,6 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.example.weboard.dto.FrkConstants;
 
+/**
+ * 상속받은 컨트롤러의 응답 양식
+ */
 public class BaseController {
 
     private <T> ResponseEntity<ApiResponse<T>> responseEntity(int resultCode, String resultMessage, T data) {

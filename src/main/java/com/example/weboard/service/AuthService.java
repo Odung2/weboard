@@ -31,17 +31,23 @@ public class AuthService {
     @Value("${jwt.refresh-expiration}")
     private int refreshJWTExpirationMs;
 
+    /**
+     * JWT 토큰에서 사용자 ID를 추출하여 주어진 ID와 비교합니다.
+     * @param id 사용자 ID
+     * @param JWT 검증할 JWT 토큰
+     * @return JWT 토큰의 ID와 주어진 ID가 일치하면 true, 그렇지 않으면 false를 반환합니다.
+     */
     public Boolean compareJwtToId(int id, String JWT){
         int idFromJwt = getIdFromToken(JWT);
         return idFromJwt == id;
     }
 
     /**
-     * 로그인 검사
-     * @param userId
-     * @param password
-     * @return
-     * @throws Exception
+     * 사용자 로그인을 처리하고, JWT 토큰을 발급합니다.
+     * @param userId 사용자 ID
+     * @param password 사용자 비밀번호
+     * @return 발급된 액세스 토큰과 리프레시 토큰을 포함한 TokensDTO 객체
+     * @throws Exception 로그인 처리 중 발생하는 예외를 던집니다.
      */
     public TokensDTO loginAndJwtProvide(String userId, String password) throws Exception { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
         UserDTO user = userService.getUserByIdOrUserId(userId);
@@ -84,8 +90,9 @@ public class AuthService {
     }
 
     /**
-     * access token valid 검사
-     * @param accessJWT
+     * 액세스 JWT의 유효성을 검증합니다.
+     * @param accessJWT 검증할 액세스 JWT
+     * @throws MalformedJwtException JWT 형식이 잘못되었을 때 예외를 던집니다.
      */
     public void checkJWTValid(String accessJWT){
         if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
@@ -104,12 +111,11 @@ public class AuthService {
     }
 
     /**
-     * access & refresh token valid 검사
-     * 만약 access token이 만료되고, refresh token이 유효하다면 새 accessJWT를 발급받아 반환한다.
-     * @param accessJWT
-     * @param refreshJWT
-     * @return newAccessJWT
-     * @throws RuntimeException
+     * 액세스 JWT와 리프레시 JWT의 유효성을 검증하고, 필요에 따라 액세스 JWT를 재발급합니다.
+     * @param accessJWT 검증할 액세스 JWT
+     * @param refreshJWT 검증할 리프레시 JWT
+     * @return 새로운 액세스 JWT를 반환합니다.
+     * @throws RuntimeException JWT 검증 실패 시 예외를 던집니다.
      */
     public String checkJWTValid(String accessJWT, String refreshJWT) throws RuntimeException {
         if(accessJWT == null || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
@@ -148,13 +154,11 @@ public class AuthService {
         }
         return "";
     }
-
-
     /**
-     * access token을 발급한다.
-     * access token은 id, userId의 정보가 포함되어 있다.
-     * @param user
-     * @return
+     * 사용자 ID를 기반으로 액세스 JWT를 생성합니다.
+     * @param id 사용자 ID
+     * @param userId 사용자의 유저 ID
+     * @return 생성된 액세스 JWT
      */
     private String generateAccessJWT(UserDTO user) {
         Date now = new Date();
@@ -182,12 +186,10 @@ public class AuthService {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
-
     /**
-     * refresh token을 발급한다.
-     * refresh token은 유저의 정보가 담겨있지 않다.
-     * @param user
-     * @return
+     * 사용자 정보를 기반으로 리프레시 JWT를 생성합니다.
+     * @param user 사용자 정보
+     * @return 생성된 리프레시 JWT
      */
     private String generateRefreshJWT(UserDTO user) {
         Date now = new Date();
@@ -203,9 +205,9 @@ public class AuthService {
     }
 
     /**
-     * JWT의 claim을 추출한다.
-     * @param BearerJWT
-     * @return JWTClaims
+     * JWT에서 클레임을 추출합니다.
+     * @param BearerJWT 분석할 Bearer JWT
+     * @return 추출된 JWT 클레임
      */
     public Jws<Claims> extractJWTClaims(String BearerJWT){
 
@@ -216,9 +218,9 @@ public class AuthService {
     }
 
     /**
-     * JWT로부터 id를 추출한다.
-     * @param JWT
-     * @return
+     * JWT에서 사용자 ID를 추출합니다.
+     * @param JWT 검증할 JWT 토큰
+     * @return 추출된 사용자 ID
      */
     public Integer getIdFromToken(String JWT) {
         if (JWT == null || !JWT.startsWith("Bearer ")) {
@@ -234,18 +236,24 @@ public class AuthService {
         }
     }
 
-
+    /**
+     * JWT 서명 키를 생성합니다.
+     * JWT 서명에 사용될 비밀키를 생성하고 반환합니다.
+     * @return 생성된 서명 키
+     */
     private Key getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-
     /**
-     * 마지막 로그인이 1개월 이전인지, 로그인이 5회이상 틀렸는지 확인한다.
-     * @param id
-     * @return
-     * @throws Exception
+     * 사용자의 마지막 로그인 시도와 실패 횟수를 검사합니다.
+     * 로그인이 5회 이상 실패했을 경우 로그인 잠금을 확인하고, 마지막 로그인 시점이 1개월을 초과했을 경우 사용자 계정을 잠급니다.
+     * @param id 사용자의 ID
+     * @return 로그인 잠금 및 마지막 로그인 검사가 문제없이 통과되면 true를 반환합니다.
+     * @throws LoginLockException 로그인 실패로 인한 잠금 상황에서 발생하는 예외
+     * @throws LastLoginException 마지막 로그인 시점이 1개월을 초과했을 때 발생하는 예외
+     * @throws Exception 검사 과정 중 발생할 수 있는 기타 예외
      */
     public boolean checkLastLoginAndLoginTrialMoreThan5(int id) throws Exception{
         UserDTO user = userService.getUserByIdOrUserId(id);

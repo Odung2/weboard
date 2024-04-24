@@ -20,27 +20,48 @@ import java.util.regex.Pattern;
 public class UserService {
     private final UserMapper userMapper;
 
-    public UserDTO getUserByIdOrUserId(int param){ //user
+    /**
+     * 사용자 ID 또는 사용자명으로 사용자 정보를 조회합니다.
+     * @param param 사용자 ID 또는 사용자명
+     * @return 조회된 사용자 정보
+     */
+    public UserDTO getUserByIdOrUserId(int param){
         UserDTO userparam = new UserDTO();
         userparam.setId(param);
         return userMapper.getUserByIdOrUserId(userparam);
     }
-    public UserDTO getUserByIdOrUserId(String param){ //user
+
+    public UserDTO getUserByIdOrUserId(String param){
         UserDTO userparam = new UserDTO();
         userparam.setUserId(param);
         return userMapper.getUserByIdOrUserId(userparam);
     }
 
+    /**
+     * 사용자 ID를 통해 비밀번호를 조회합니다.
+     * @param id 사용자 ID
+     * @return 해당 사용자의 비밀번호
+     */
     public String getPasswordById(int id) {
         return userMapper.getPasswordById(id);
     }
 
+    /**
+     * 사용자의 로그인 실패 횟수를 증가시키고 최신 실패 횟수를 반환합니다.
+     * @param param 사용자 정보
+     * @return 업데이트된 로그인 실패 횟수
+     */
     public int addLoginFailCount(UserDTO param){
         userMapper.addLoginFailCount(param.getId());
         UserDTO user = userMapper.getUserByIdOrUserId(param);
         return user.getLoginFail();
     }
 
+    /**
+     * 사용자의 로그인 실패 횟수와 잠금 상태를 초기화합니다.
+     * @param param 사용자 정보
+     * @return 초기화 후의 로그인 실패 횟수
+     */
     public int resetLoginFailCountAndLoginLocked(UserDTO param){
         int id = param.getId();
         userMapper.resetLoginFailCount(id);
@@ -49,17 +70,32 @@ public class UserService {
         return user.getLoginFail();
     }
 
+    /**
+     * 사용자의 잠금 상태를 업데이트합니다.
+     * @param id 사용자 ID
+     * @param isLocked 잠금 상태 (1: 잠금, 0: 잠금 해제)
+     * @return 업데이트 결과
+     */
     public int lockUnlockUser(int id, int isLocked){
-        //만약 lockUser==1: lockUser 실행, lockUser==0: unlockUser 실행
-        // usermapper 인자 UserDTO, isLocked만 수정해서 ㄱㄱ
         return userMapper.lockUnlockUser(id, isLocked);
     }
 
+    /**
+     * 사용자의 로그인 잠금 시간을 업데이트합니다.
+     * @param user 사용자 정보
+     * @return 업데이트 결과
+     */
     public int updateLoginLock(UserDTO user){
-        user.setLoginLocked(new Date()); //@lastModifiedDate 어노테이션이 제대로 작동하지 않음...
+        user.setLoginLocked(new Date());
         return userMapper.updateLoginLocked(user);
     }
 
+    /**
+     * 새로운 사용자를 데이터베이스에 삽입합니다.
+     * @param user 사용자 정보
+     * @return 삽입된 사용자 정보
+     * @throws Exception 비밀번호 검증 실패 시 예외 발생
+     */
     public UserDTO insertUser(UserDTO user) throws Exception {
         String plainPassword = user.getPassword();
         if(checkNewPwValid(plainPassword)){
@@ -70,35 +106,38 @@ public class UserService {
         return user;
     }
 
+    /**
+     * 주어진 ID의 사용자 정보를 업데이트합니다.
+     * @param user 사용자 정보
+     * @param id 사용자 ID
+     * @return 업데이트된 사용자 정보
+     */
     public UserDTO updateUser(UserDTO user, int id) {
         user.setId(id);
-
-//        Integer count = 0;
-//        if(user.getUserId()!=null){ //변경 불가능
-//            count += 1;
-//        }
-//        if(user.getNickname()!=null){
-//            count += 1;
-//        }
-//        if(user.getPassword()!=null){
-//            count += 1;
-//        }
-
         String plainPassword = user.getPassword();
-        if(plainPassword!=null){
+        if(plainPassword != null){
             String sha256Password = plainToSha256(plainPassword);
             user.setPassword(sha256Password);
         }
         user.setUpdatedAt(LocalDateTime.now());
-
         userMapper.update(user);
         return user;
     }
 
+    /**
+     * 사용자를 데이터베이스에서 삭제합니다.
+     * @param id 삭제할 사용자 ID
+     * @return 삭제 결과
+     */
     public int deleteUser(int id){
         return userMapper.delete(id);
     }
 
+    /**
+     * 평문을 SHA-256 해시로 변환합니다.
+     * @param plaintext 평문 비밀번호
+     * @return 해시된 비밀번호
+     */
     public String plainToSha256(String plaintext) {
         MessageDigest mdSHA256 = null;
         try {
@@ -107,7 +146,6 @@ public class UserService {
             throw new RuntimeException(e);
         }
         byte[] sha256Password = mdSHA256.digest(plaintext.getBytes(StandardCharsets.UTF_8));
-
         StringBuilder hexString = new StringBuilder();
         for (byte b : sha256Password) {
             String hex = Integer.toHexString(0xff & b);
@@ -119,11 +157,17 @@ public class UserService {
         return hexString.toString();
     }
 
+    /**
+     * 새 비밀번호의 유효성을 검사합니다.
+     * @param password 검사할 비밀번호
+     * @return 검사 결과
+     * @throws Exception 비밀번호 길이 또는 형식 불일치로 인한 예외 발생
+     */
     public boolean checkNewPwValid(String password) throws Exception{
-        if(password.length()<8){
+        if(password.length() < 8){
             throw new ShortPasswordException();
         }
-        if(password.length()<12){
+        if(password.length() < 12){
             if(!Pattern.matches(FrkConstants.passwordRegexUnder12, password)){
                 throw new PasswordRegexException("12자 미만의 경우 영문 대문자, 소문자, 숫자, 특수문자의 조합으로 입력해주세요.");
             }
@@ -134,5 +178,6 @@ public class UserService {
         }
         return true;
     }
+
 
 }

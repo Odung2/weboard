@@ -18,30 +18,64 @@ public class UserController extends BaseController{
     private final UserService userService;
     private final AuthService authService;
 
+    /**
+     * 특정 사용자의 정보를 ID로 조회합니다.
+     * Authorization 헤더를 통해 요청 인증을 수행하고, 사용자 정보를 반환합니다.
+     * @param jwttoken 인증을 위한 JWT 토큰
+     * @param id 조회할 사용자의 ID
+     * @return 조회된 사용자 정보와 상태 메시지를 담은 ResponseEntity
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> getUserById(@RequestHeader("Authorization") String jwttoken, @PathVariable int id) { // interceptor 를 이용 Authorization을 매번 체크? ->
+    public ResponseEntity<ApiResponse<UserDTO>> getUserById(@RequestHeader("Authorization") String jwttoken, @PathVariable int id) {
         userService.getUserByIdOrUserId(id);
         return ok(FrkConstants.getUser, userService.getUserByIdOrUserId(id));
     }
 
+    /**
+     * 새로운 사용자를 등록합니다.
+     * @param userDTO 등록할 사용자의 데이터를 담은 DTO
+     * @return 등록된 사용자 정보와 상태 메시지를 담은 ResponseEntity
+     */
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<UserDTO>> insertUser(@RequestBody UserDTO userDTO) throws Exception {
         return ok(FrkConstants.insertUser, userService.insertUser(userDTO));
     }
 
+    /**
+     * 특정 사용자 정보를 업데이트합니다.
+     * Authorization 헤더를 통해 요청 인증을 수행하고, 사용자 정보를 업데이트합니다.
+     * @param jwttoken 인증을 위한 JWT 토큰
+     * @param userDTO 업데이트할 사용자의 데이터를 담은 DTO
+     * @param id 업데이트할 사용자의 ID
+     * @return 업데이트된 사용자 정보와 상태 메시지를 담은 ResponseEntity
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> updateUser(@RequestHeader("Authorization") String jwttoken, @RequestBody UserDTO userDTO, @PathVariable int id){
         return ok(FrkConstants.updateUser, userService.updateUser(userDTO, id));
     }
 
+    /**
+     * 특정 사용자를 삭제합니다.
+     * Authorization 헤더를 통해 요청 인증을 수행하고, 사용자를 삭제합니다.
+     * @param jwttoken 인증을 위한 JWT 토큰
+     * @param id 삭제할 사용자의 ID
+     * @return 삭제된 사용자의 ID와 상태 메시지를 담은 ResponseEntity
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Integer>> deleteUser(@RequestHeader("Authorization") String jwttoken, @PathVariable int id){
         return ok(FrkConstants.deleteUser, userService.deleteUser(id));
     }
 
+    /**
+     * 사용자 로그인을 처리합니다.
+     * 제공된 사용자 ID와 비밀번호로 인증을 수행하고, 성공 시 JWT 토큰을 반환합니다.
+     * @param userId 로그인할 사용자의 ID
+     * @param password 로그인할 사용자의 비밀번호
+     * @return 로그인 성공 시 발급된 토큰을 포함한 ResponseEntity
+     */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokensDTO>> login(@RequestParam(value="userId") String userId, @RequestParam(value="password") String password) throws Exception {
-            return ok(FrkConstants.successLogin, authService.loginAndJwtProvide(userId, password));
+        return ok(FrkConstants.successLogin, authService.loginAndJwtProvide(userId, password));
     }
 
 }
