@@ -96,7 +96,7 @@ public class AuthService {
      */
     public void checkJWTValid(String accessJWT){
         if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
-            throw new MalformedJwtException("");
+            throw new MalformedJwtException("dd");
         }
         String jwtToken = accessJWT.substring(7);
         try {
@@ -228,7 +228,7 @@ public class AuthService {
         }
         String jwtToken = JWT.substring(7);
         try {
-            return Integer.parseInt(extractJWTClaims(JWT).getBody().getSubject());
+            return Integer.parseInt(extractJWTClaims(jwtToken).getBody().getSubject());
         } catch (ExpiredJwtException e) {
             throw new RuntimeException("토큰이 만료되었습니다.");
         } catch (JwtException e) {

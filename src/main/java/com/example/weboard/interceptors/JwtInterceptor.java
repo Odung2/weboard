@@ -31,6 +31,9 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (request.getMethod().equals("GET") && requestURL.startsWith("http://localhost:8080/weboard/comments/") ){
             return true;
         }
+        if (request.getMethod().equals("GET") && requestURL.startsWith("http://localhost:8080/weboard/posts/") ){
+            return true;
+        }
 
         String accessJWT = request.getHeader("Authorization");
         String refreshJWT = request.getHeader("Refresh-token");

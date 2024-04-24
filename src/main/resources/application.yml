@@ -39,8 +39,8 @@ mybatis:
 
 jwt:
   secret: randomsecretkey123hellohibyethisissecretokitistooshorttomakejsonwebtokenhowlongdoeshs512works
-#  access-expiration: 3600000
-#  refresh-expiration: 7200000
-  access-expiration: 60000
-  refresh-expiration: 240000
+  access-expiration: 3600000
+  refresh-expiration: 7200000
+#  access-expiration: 60000
+#  refresh-expiration: 240000
 
