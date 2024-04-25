@@ -16,15 +16,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class CommentDTO extends BaseDTO {
 
     @Schema(description = "댓글 ID", required = true)
-    private int commentId;
+    public int commentId;
 
     @Schema(description = "게시물 ID", required = true)
-    private int postId;
+    public int postId;
 
     @Schema(description = "사용자 ID", required = true)
-    private int userId;
+    public int userId;
 
     @Schema(description = "댓글 내용", required = true)
-    private String commentText;
+    public String commentText;
 
 }

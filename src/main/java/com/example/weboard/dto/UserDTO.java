@@ -19,10 +19,8 @@ import java.util.Date;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Schema(description = "사용자 정보를 나타내는 DTO")
-public class UserDTO {
+public class UserDTO extends BaseDTO{
 
-    @NotBlank
-    @NotNull
     @Schema(description = "사용자 ID", required = true)
     private int id;
 
