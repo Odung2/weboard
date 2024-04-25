@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class UpdateUserParam {
 
     @Schema(description = "사용자 닉네임")

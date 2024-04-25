@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class SignupParam {
 
     @NotBlank

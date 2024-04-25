@@ -4,6 +4,7 @@ import com.example.weboard.dto.ApiResponse;
 import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.dto.PostDTO;
 import com.example.weboard.dto.PostViewBO;
+import com.example.weboard.param.BasePagingParam;
 import com.example.weboard.param.InsertPostParam;
 import com.example.weboard.param.UpdatePostParam;
 import com.example.weboard.service.PostService;
@@ -28,14 +29,14 @@ public class PostController extends BaseController{
     /**
      * 모든 게시물을 오프셋 기준으로 n개씩 반환합니다.
      *
-     * @param offset 오프셋 값
+     * @param basePagingParam 오프셋 값
      * @return 게시물 목록과 상태 메시지를 담은 ResponseEntity
      */
     @Operation(summary = "모든 게시물을 오프셋 기준으로 n개씩 반환합니다.")
-    @GetMapping
+    @PostMapping("/list")
     public ResponseEntity<ApiResponse<List<PostDTO>>> getPostAllByOffset(
-            @RequestParam int offset) {
-        return ok(FrkConstants.getAllPost, postService.getPostAllByOffset(offset));
+            @RequestBody @Valid BasePagingParam basePagingParam) {
+        return ok(FrkConstants.getAllPost, postService.getPostAllByOffset(basePagingParam));
     }
 
     /**

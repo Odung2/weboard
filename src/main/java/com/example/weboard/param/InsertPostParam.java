@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class InsertPostParam {
 
 //    @NotBlank

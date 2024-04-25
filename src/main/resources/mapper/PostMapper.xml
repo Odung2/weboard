@@ -12,7 +12,7 @@
     </select>
 
     <select id="getPostAllByOffset" parameterType="int" resultType="PostDTO">
-        SELECT * FROM post LIMIT 5
+        SELECT * FROM post LIMIT #{pagesize}
                  <if test="offset!=null">
                      OFFSET #{offset}
                  </if>

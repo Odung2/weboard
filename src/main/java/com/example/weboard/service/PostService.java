@@ -3,6 +3,7 @@ package com.example.weboard.service;
 import com.example.weboard.dto.PostViewBO;
 import com.example.weboard.mapper.PostMapper;
 import com.example.weboard.dto.PostDTO;
+import com.example.weboard.param.BasePagingParam;
 import com.example.weboard.param.InsertPostParam;
 import com.example.weboard.param.UpdatePostParam;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,11 @@ public class PostService {
 
     /**
      * 지정된 오프셋부터 모든 게시물을 조회합니다.
-     * @param offset 시작할 위치의 오프셋
+     * @param basePagingParam 시작할 위치의 오프셋
      * @return 오프셋 기준으로 조회된 게시물 목록
      */
-    public List<PostDTO> getPostAllByOffset(int offset) {
-        return postMapper.getPostAllByOffset(offset);
+    public List<PostDTO> getPostAllByOffset(BasePagingParam basePagingParam) {
+        return postMapper.getPostAllByOffset((int) basePagingParam.getCurrPage(), (int) basePagingParam.getPageSize());
     }
 
     /**

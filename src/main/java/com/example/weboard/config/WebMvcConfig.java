@@ -35,6 +35,6 @@ public class WebMvcConfig  implements WebMvcConfigurer {
                 .addPathPatterns("/weboard/**")
                 .excludePathPatterns("/weboard/users/signup")
                 .excludePathPatterns("/weboard/users/login")
-                .excludePathPatterns("/weboard/posts");
+                .excludePathPatterns("/weboard/posts/list");
     }
 }

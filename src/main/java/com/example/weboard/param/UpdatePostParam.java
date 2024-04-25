@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class UpdatePostParam {
 
     @NotBlank(message = "제목을 작성해주세요.")
