@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Schema(description = "게시물 정보를 담는 DTO")
-public class PostDTO {
+public class PostDTO extends BaseDTO{
 
     @Schema(description = "게시물 ID", required = true)
     private int postId;
@@ -30,18 +30,5 @@ public class PostDTO {
     @Schema(description = "파일 데이터")
     private byte[] fileData;
 
-    @Schema(description = "작성자 ID", required = true)
-    private int createdBy;
 
-    @CreatedDate
-    @Column(updatable = false)
-    @Schema(description = "작성일", readOnly = true)
-    private String createdAt;
-
-    @Schema(description = "최종 수정한 사용자의 ID")
-    private Integer updatedBy;
-
-    @LastModifiedDate
-    @Schema(description = "최종 수정일")
-    private String updatedAt;
 }

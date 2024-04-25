@@ -6,6 +6,7 @@ import com.example.weboard.dto.TokensDTO;
 import com.example.weboard.dto.UserDTO;
 import com.example.weboard.service.AuthService;
 import com.example.weboard.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +46,7 @@ public class UserController extends BaseController{
     @Operation(summary = "새로운 사용자 등록", description = "새로운 사용자를 등록합니다.")
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<UserDTO>> insertUser(
-            @RequestBody UserDTO userDTO) throws Exception {
+            @RequestBody @Valid UserDTO userDTO) throws Exception {
         return ok(FrkConstants.insertUser, userService.insertUser(userDTO));
     }
 

@@ -3,12 +3,14 @@ package com.example.weboard.dto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -19,6 +21,8 @@ import java.util.Date;
 @Schema(description = "사용자 정보를 나타내는 DTO")
 public class UserDTO {
 
+    @NotBlank
+    @NotNull
     @Schema(description = "사용자 ID", required = true)
     private int id;
 
@@ -28,20 +32,12 @@ public class UserDTO {
     @Schema(description = "사용자 닉네임")
     private String nickname;
 
+    @NotBlank
+    @NotNull
+    @Size(min = 8, max=16, message = "8자 이상 16자 이하의 비밀번호만 가능합니다.")
     @Schema(description = "사용자 비밀번호")
     private String password;
-
-    @Schema(description = "생성일", readOnly = true)
-    @CreatedDate
-    @Column(updatable = false)
-    private String createdAt;
-
-    @Schema(description = "최종 수정한 사용자의 ID")
-    private Integer updatedBy;
-
-    @Schema(description = "최종 수정 일자")
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    //regex는 12자 미만, 12자 이상 조건이 달라서 조건 체크로 남겨둠.
 
     @Schema(description = "마지막 로그인 일자")
     @LastModifiedDate

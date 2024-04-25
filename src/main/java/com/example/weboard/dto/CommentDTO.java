@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Schema(description = "댓글 정보를 담는 DTO")
-public class CommentDTO {
+public class CommentDTO extends BaseDTO {
 
     @Schema(description = "댓글 ID", required = true)
     private int commentId;
@@ -27,19 +27,4 @@ public class CommentDTO {
     @Schema(description = "댓글 내용", required = true)
     private String commentText;
 
-    @Schema(description = "작성자 ID", required = true)
-    private int createdBy;
-
-    @CreatedDate
-    @Column(updatable = false)
-    @Schema(description = "작성일", readOnly = true)
-    private String createdAt;
-
-
-    @Schema(description = "최종 수정한 사용자의 ID")
-    private Integer updatedBy;
-
-    @LastModifiedDate
-    @Schema(description = "최종 수정일")
-    private String updatedAt;
 }
