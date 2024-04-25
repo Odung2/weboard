@@ -118,3 +118,8 @@ Access token이 만료된 후에, Refresh token이 유효하다면 다시 Access
 
 #### 마지막 비밀번호 변경 검사
 마지막 비밀번호 변경일로부터 3개월이 지났다면, 비밀번호를 바꾸라는 (에러)메시지가 나타납니다.
+
+
+### TEST
+swagger을 통해 api를 테스트할 수 있습니다.
+실행 후 [swagger page] (http://localhost:8080/swagger-ui/index.html#/) 로 접속
