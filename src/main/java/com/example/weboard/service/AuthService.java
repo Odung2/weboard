@@ -4,6 +4,7 @@ import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.dto.TokensDTO;
 import com.example.weboard.dto.UserDTO;
 import com.example.weboard.exception.*;
+import com.example.weboard.param.LoginParam;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -44,20 +45,19 @@ public class AuthService {
 
     /**
      * 사용자 로그인을 처리하고, JWT 토큰을 발급합니다.
-     * @param userId 사용자 ID
-     * @param password 사용자 비밀번호
+     * @param loginParam userId & password
      * @return 발급된 액세스 토큰과 리프레시 토큰을 포함한 TokensDTO 객체
      * @throws Exception 로그인 처리 중 발생하는 예외를 던집니다.
      */
-    public TokensDTO loginAndJwtProvide(String userId, String password) throws Exception { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
-        UserDTO user = userService.getUserByIdOrUserId(userId);
+    public TokensDTO loginAndJwtProvide(LoginParam loginParam) throws Exception { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
+        UserDTO user = userService.getUserByIdOrUserId(loginParam.getUserId());
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다.");
         }
         int id=user.getId();
 
         String storedPassword = user.getPassword();
-        String hashedPassword = userService.plainToSha256(password);
+        String hashedPassword = userService.plainToSha256(loginParam.getPassword());
 
         boolean valid = checkLastLoginAndLoginTrialMoreThan5(id);
 

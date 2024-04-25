@@ -4,6 +4,9 @@ import com.example.weboard.dto.ApiResponse;
 import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.dto.TokensDTO;
 import com.example.weboard.dto.UserDTO;
+import com.example.weboard.param.LoginParam;
+import com.example.weboard.param.SignupParam;
+import com.example.weboard.param.UpdateUserParam;
 import com.example.weboard.service.AuthService;
 import com.example.weboard.service.UserService;
 import jakarta.validation.Valid;
@@ -40,21 +43,21 @@ public class UserController extends BaseController{
 
     /**
      * 새로운 사용자를 등록합니다.
-     * @param userDTO 등록할 사용자의 데이터를 담은 DTO
+     * @param signupParam 등록할 사용자의 데이터를 담은 DTO
      * @return 등록된 사용자 정보와 상태 메시지를 담은 ResponseEntity
      */
     @Operation(summary = "새로운 사용자 등록", description = "새로운 사용자를 등록합니다.")
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<UserDTO>> insertUser(
-            @RequestBody @Valid UserDTO userDTO) throws Exception {
-        return ok(FrkConstants.insertUser, userService.insertUser(userDTO));
+            @RequestBody @Valid SignupParam signupParam) throws Exception {
+        return ok(FrkConstants.insertUser, userService.insertUser(signupParam));
     }
 
     /**
      * 특정 사용자 정보를 업데이트합니다.
      * Authorization 헤더를 통해 요청 인증을 수행하고, 사용자 정보를 업데이트합니다.
      * @param jwttoken 인증을 위한 JWT 토큰
-     * @param userDTO 업데이트할 사용자의 데이터를 담은 DTO
+     * @param updateUserParam 업데이트할 사용자의 데이터를 담은 DTO
      * @param id 업데이트할 사용자의 ID
      * @return 업데이트된 사용자 정보와 상태 메시지를 담은 ResponseEntity
      */
@@ -62,9 +65,9 @@ public class UserController extends BaseController{
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> updateUser(
             @RequestHeader("Authorization") String jwttoken,
-            @RequestBody UserDTO userDTO,
+            @RequestBody @Valid UpdateUserParam updateUserParam,
             @PathVariable int id){
-        return ok(FrkConstants.updateUser, userService.updateUser(userDTO, id));
+        return ok(FrkConstants.updateUser, userService.updateUser(updateUserParam, id));
     }
 
     /**
@@ -85,18 +88,14 @@ public class UserController extends BaseController{
     /**
      * 사용자 로그인을 처리합니다.
      * 제공된 사용자 ID와 비밀번호로 인증을 수행하고, 성공 시 JWT 토큰을 반환합니다.
-     * @param userId 로그인할 사용자의 ID
-     * @param password 로그인할 사용자의 비밀번호
+     * @param loginParam 로그인할 userId & password
      * @return 로그인 성공 시 발급된 토큰을 포함한 ResponseEntity
      */
     @Operation(summary = "사용자 로그인", description = "사용자 로그인을 처리합니다.")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokensDTO>> login(
-            @Parameter(description = "로그인할 사용자의 ID", required = true)
-            @RequestParam(value="userId") String userId,
-            @Parameter(description = "로그인할 사용자의 비밀번호", required = true)
-            @RequestParam(value="password") String password) throws Exception {
-        return ok(FrkConstants.successLogin, authService.loginAndJwtProvide(userId, password));
+            @RequestBody @Valid LoginParam loginParam) throws Exception {
+        return ok(FrkConstants.successLogin, authService.loginAndJwtProvide(loginParam));
     }
 
 }

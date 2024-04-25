@@ -5,6 +5,8 @@ import com.example.weboard.exception.PasswordRegexException;
 import com.example.weboard.exception.ShortPasswordException;
 import com.example.weboard.mapper.UserMapper;
 import com.example.weboard.dto.UserDTO;
+import com.example.weboard.param.SignupParam;
+import com.example.weboard.param.UpdateUserParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -92,12 +94,15 @@ public class UserService {
 
     /**
      * 새로운 사용자를 데이터베이스에 삽입합니다.
-     * @param user 사용자 정보
+     * @param signupParam 사용자 정보
      * @return 삽입된 사용자 정보
      * @throws Exception 비밀번호 검증 실패 시 예외 발생
      */
-    public UserDTO insertUser(UserDTO user) throws Exception {
-        String plainPassword = user.getPassword();
+    public UserDTO insertUser(SignupParam signupParam) throws Exception {
+        String plainPassword = signupParam.getPassword();
+        UserDTO user = new UserDTO();
+        user.setUserId(signupParam.getUserId());
+        user.setNickname(signupParam.getNickname());
         if(checkNewPwValid(plainPassword)){
             String sha256Password = plainToSha256(plainPassword);
             user.setPassword(sha256Password);
@@ -108,13 +113,15 @@ public class UserService {
 
     /**
      * 주어진 ID의 사용자 정보를 업데이트합니다.
-     * @param user 사용자 정보
+     * @param updateUserParam 사용자 정보
      * @param id 사용자 ID
      * @return 업데이트된 사용자 정보
      */
-    public UserDTO updateUser(UserDTO user, int id) {
+    public UserDTO updateUser(UpdateUserParam updateUserParam, int id) {
+        UserDTO user = new UserDTO();
         user.setId(id);
-        String plainPassword = user.getPassword();
+        user.setNickname(updateUserParam.getNickname());
+        String plainPassword = updateUserParam.getPassword();
         if(plainPassword != null){
             String sha256Password = plainToSha256(plainPassword);
             user.setPassword(sha256Password);

@@ -3,6 +3,8 @@ package com.example.weboard.service;
 import com.example.weboard.dto.PostViewBO;
 import com.example.weboard.mapper.PostMapper;
 import com.example.weboard.dto.PostDTO;
+import com.example.weboard.param.InsertPostParam;
+import com.example.weboard.param.UpdatePostParam;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
@@ -43,12 +45,16 @@ public class PostService {
     /**
      * 새로운 게시물을 추가합니다.
      * JWT 토큰에서 사용자 ID를 추출하여 게시물의 생성자로 설정한 후 데이터베이스에 삽입합니다.
-     * @param post 삽입할 게시물 데이터
+     * @param insertPostParam 삽입할 게시물 데이터
      * @param jwttoken 요청자의 JWT 토큰
      * @return 데이터베이스에 삽입된 게시물 객체
      */
-    public PostDTO insertPost(PostDTO post, String jwttoken){
+    public PostDTO insertPost(InsertPostParam insertPostParam, String jwttoken){
         Integer userId = authService.getIdFromToken(jwttoken);
+        PostDTO post = new PostDTO();
+        post.setTitle(insertPostParam.getTitle());
+        post.setContents(insertPostParam.getContents());
+        post.setFileData(insertPostParam.getFileData());
         post.setCreatedBy(userId);
         postMapper.insert(post);
         return post;
@@ -57,12 +63,16 @@ public class PostService {
     /**
      * 주어진 ID의 게시물을 업데이트합니다.
      * JWT 토큰에서 사용자 ID를 추출하여 게시물의 수정자로 설정한 후 데이터베이스에 업데이트합니다.
-     * @param post 업데이트할 게시물 데이터
+     * @param updatePostParam 업데이트할 게시물 데이터
      * @param postId 업데이트할 게시물의 ID
      * @param jwttoken 요청자의 JWT 토큰
      * @return 데이터베이스에 업데이트된 게시물 객체
      */
-    public PostDTO updatePost(PostDTO post, int postId, String jwttoken){
+    public PostDTO updatePost(UpdatePostParam updatePostParam, int postId, String jwttoken){
+        PostDTO post = new PostDTO();
+        post.setTitle(updatePostParam.getTitle());
+        post.setContents(updatePostParam.getContents());
+        post.setFileData(updatePostParam.getFileData());
         post.setPostId(postId);
         Integer userId = authService.getIdFromToken(jwttoken);
         post.setUpdatedBy(userId);
