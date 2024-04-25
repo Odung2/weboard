@@ -30,9 +30,6 @@ public class UserDTO extends BaseDTO{
     @Schema(description = "사용자 닉네임")
     private String nickname;
 
-    @NotBlank
-    @NotNull
-    @Size(min = 8, max=16, message = "8자 이상 16자 이하의 비밀번호만 가능합니다.")
     @Schema(description = "사용자 비밀번호")
     private String password;
     //regex는 12자 미만, 12자 이상 조건이 달라서 조건 체크로 남겨둠.

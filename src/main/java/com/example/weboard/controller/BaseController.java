@@ -27,7 +27,6 @@ public class BaseController {
 
     }
 
-
     protected <T> ResponseEntity<ApiResponse<T>> nok(int resultCode, String message, T data) {
         return responseEntity(resultCode, message, data);
     }
