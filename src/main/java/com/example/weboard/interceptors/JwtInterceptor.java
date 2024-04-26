@@ -40,9 +40,9 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         String accessJWT = request.getHeader("Authorization");
         String refreshJWT = request.getHeader("Refresh-token");
-        StringUtils.isBlank(refreshJWT)
-        if(refreshJWT==null || refreshJWT.isEmpty()){
-            authService.checkJWTValid(accessJWT);
+
+        if(StringUtils.isBlank(refreshJWT)){
+            authService.checkAccessJWTValid(accessJWT);
         }else{
             String newAccessToken=authService.checkJWTValid(accessJWT, refreshJWT);
             if (newAccessToken != null && !newAccessToken.isEmpty()) {
@@ -53,24 +53,6 @@ public class JwtInterceptor implements HandlerInterceptor {
         request.setAttribute("reqUserId", userId);
         //RequestContextHolder.
 
-        if(requestURL.startsWith("http://localhost:8080/weboard/users/")){
-            String[] uriParts = requestURL.split("/");
-            int id = Integer.parseInt(uriParts[uriParts.length-1]);
-
-            if(idFromJwt!=id){ //로그인 유저와 요청 정보의 유저가 다른 사람일 경우
-                switch (request.getMethod()){
-                    case "GET":
-                        throw new BadRequestException("BAD_REQUEST: 본인이 아닌 유저의 정보를 확인할 수 없습니다.");
-                    case "PUT":
-                        throw new BadRequestException("BAD_REQUEST: 본인이 아닌 유저의 정보를 수정할 수 없습니다.");
-                    case "DELETE":
-                        throw new BadRequestException("BAD_REQUEST: 본인이 아닌 유저의 정보를 삭제할 수 없습니다.");
-                    default:
-                        break;
-                }
-            }
-
-        }
 
         return true;
     }

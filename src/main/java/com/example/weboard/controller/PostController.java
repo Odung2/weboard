@@ -36,7 +36,7 @@ public class PostController extends BaseController{
     @PostMapping("/public")
     public ResponseEntity<ApiResponse<List<PostDTO>>> getPostAllByOffset(
             @RequestBody @Valid BasePagingParam basePagingParam) {
-        return ok(FrkConstants.getAllPost, postService.getPostAllByOffset(basePagingParam));
+        return ok(postService.getPostAllByOffset(basePagingParam));
     }
 
     /**
@@ -49,7 +49,7 @@ public class PostController extends BaseController{
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostViewBO>> getPostById(
             @PathVariable int postId) {
-        return ok(FrkConstants.getPostView, postService.getPostById(postId));
+        return ok(postService.getPostById(postId));
     }
 
     /**
@@ -62,10 +62,8 @@ public class PostController extends BaseController{
     @Operation(summary = "새로운 게시물을 추가합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<PostDTO>> insertPost(
-            @RequestBody @Valid InsertPostParam insertPostParam,
-            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
-            @RequestHeader("Authorization") String jwttoken) {
-        return ok(FrkConstants.insertPost, postService.insertPost(insertPostParam, jwttoken));
+            @RequestBody @Valid InsertPostParam insertPostParam) {
+        return ok(postService.insertPost(insertPostParam, jwttoken));
     }
 
     /**
@@ -79,11 +77,9 @@ public class PostController extends BaseController{
     @Operation(summary = "유저가 작성한 본인의 게시물을 업데이트(수정)합니다.")
     @PutMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostDTO>> updatePost(
-            @RequestHeader("Authorization") String jwttoken,
-            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
             @PathVariable int postId,
             @RequestBody @Valid UpdatePostParam updatePostParam) {
-        return ok(FrkConstants.updatePost, postService.updatePost(updatePostParam, postId, jwttoken));
+        return ok(postService.updatePost(updatePostParam, postId, jwttoken));
     }
 
     /**
@@ -96,10 +92,8 @@ public class PostController extends BaseController{
     @Operation(summary = "유저가 작성한 본인의 게시물을 삭제합니다.")
     @DeleteMapping("/{postId}")
     public ResponseEntity<ApiResponse<Integer>> deletePost(
-            @RequestHeader("Authorization") String jwttoken,
-            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
             @PathVariable int postId) throws BadRequestException {
-        return ok(FrkConstants.deletePost, postService.deletePost(postId, jwttoken));
+        return ok(postService.deletePost(postId, jwttoken));
     }
 
 }

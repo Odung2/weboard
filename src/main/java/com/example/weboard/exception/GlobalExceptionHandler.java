@@ -27,7 +27,7 @@ public class GlobalExceptionHandler extends BaseController {
     public ResponseEntity<ApiResponse<Object>> handleExpiredJwtException(ExpiredJwtException e){
 //        ApiResponse apiResponse = new ApiResponse(403, "토큰이 만료되었습니다", null);
 //        return ResponseEntity.status(403).body(apiResponse);
-        return nok(403, "토큰이 만료되었습니다.", null);
+        return nok(403, e.getMessage(), null);
     }
 
     @ExceptionHandler(MalformedJwtException.class)

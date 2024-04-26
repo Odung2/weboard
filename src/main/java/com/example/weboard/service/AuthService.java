@@ -5,9 +5,11 @@ import com.example.weboard.dto.TokensDTO;
 import com.example.weboard.dto.UserDTO;
 import com.example.weboard.exception.*;
 import com.example.weboard.param.LoginParam;
+import com.example.weboard.param.TokensParam;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.weaver.ast.Expr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ public class AuthService {
      * @throws Exception 로그인 처리 중 발생하는 예외를 던집니다.
      */
     public TokensDTO loginAndJwtProvide(LoginParam loginParam) throws Exception { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
-        UserDTO user = userService.getUserByIdOrUserId(loginParam.getUserId());
+        UserDTO user = userService.getUser(loginParam.getUserId());
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다.");
         }
@@ -94,7 +96,7 @@ public class AuthService {
      * @param accessJWT 검증할 액세스 JWT
      * @throws MalformedJwtException JWT 형식이 잘못되었을 때 예외를 던집니다.
      */
-    public void checkJWTValid(String accessJWT){
+    public void checkAccessJWTValid(String accessJWT){
         if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
             throw new MalformedJwtException("dd");
         }
@@ -117,42 +119,38 @@ public class AuthService {
      * @return 새로운 액세스 JWT를 반환합니다.
      * @throws RuntimeException JWT 검증 실패 시 예외를 던집니다.
      */
-    public String checkJWTValid(String accessJWT, String refreshJWT) throws RuntimeException {
-        if(accessJWT == null || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
-            throw new MalformedJwtException("");
+    public String checkRefreshJWTValid(TokensParam tokensParam) throws RuntimeException {
+        String accessJWT = tokensParam.getAccessToken();
+        String refreshJWT = tokensParam.getRefreshToken();
+        if(StringUtils.isBlank(accessJWT) || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
+            throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
         }
-        accessJWT = accessJWT.substring(7);
-        Jws<Claims> accessClaims;
-//        refreshJWT = refreshJWT.substring(7);
+
         int id=0;
         StringBuilder userId = new StringBuilder();
-        try {
-            extractJWTClaims(accessJWT);
-            // refresh token 유효성 확인 -> access token 재발급
-
-        } catch (ExpiredJwtException e) {
+        if((redisService.getValues(accessJWT)).equals(refreshJWT)){
             try {
-                if((redisService.getValues(accessJWT)).equals(refreshJWT)){
-
-                    extractJWTClaims(refreshJWT);
-                    id = Integer.parseInt(e.getClaims().getSubject());
-                    userId.append(e.getClaims().get("userId", String.class));
-                }else{
-                    throw new MalformedJwtException("access token과 refresh token이 일치하지 않습니다.");
-                }
+                extractJWTClaims(refreshJWT);
             } catch (ExpiredJwtException e1) {
-                 // 예외 메시지 추가
-                throw new MalformedJwtException("refresh token도 만료되었습니다. 다시 로그인 해주세요.");
-            } catch (ClaimJwtException e3) {
-                throw new MalformedJwtException("claim jwt exception");
+                throw new ExpiredJwtException(e1.getHeader(), e1.getClaims(), e1.getMessage());
             }
+        }else{
+            throw new MalformedJwtException("access token에 해당하는 refresh token이 존재하지 않습니다.");
+        }
+
+        try {
+            // refresh token 유효성 확인 -> access token 재발급
+            extractJWTClaims(accessJWT);
+        } catch (ExpiredJwtException e) {
+            id = Integer.parseInt(e.getClaims().getSubject());
+            userId.append(e.getClaims().get("userId", String.class));
             // refresh token 유효성 확인 -> access token 재발급
             redisService.deleteValues(accessJWT);
             String newAccessJWT = generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
             redisService.setValues(newAccessJWT, refreshJWT);
             return newAccessJWT;
         }
-        return "";
+        throw new ;
     }
     /**
      * 사용자 ID를 기반으로 액세스 JWT를 생성합니다.
