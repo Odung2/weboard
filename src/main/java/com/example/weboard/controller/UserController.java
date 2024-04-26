@@ -34,12 +34,29 @@ public class UserController extends BaseController{
     @Operation(summary = "특정 사용자의 정보를 조회", description = "특정 사용자의 정보를 ID로 조회합니다.")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(
-            @RequestHeader("Authorization") String jwttoken,
-            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
+            // FIXME : jwttoken, refreshToeken을 헤더에 추가할 필요 없음
+            @PathVariable int id) {
+        return ok(FrkConstants.getUser, userService.getUser(id));
+    }
+
+    @Operation(summary = "특정 사용자의 정보를 조회", description = "특정 사용자의 정보를 ID로 조회합니다.")
+    @GetMapping("/myInfo")
+    public ResponseEntity<ApiResponse<UserDTO>> getMyInfo(
+            // FIXME : jwttoken, refreshToeken을 헤더에 추가할 필요 없음
+            @RequestAttribute("reqUserId") int userID) {
+        return ok(FrkConstants.getUser, userService.getUser(userID));
+    }
+
+    @Operation(summary = "특정 사용자의 정보를 조회", description = "특정 사용자의 정보를 ID로 조회합니다.")
+    @PutMapping("/myInfo")
+    public ResponseEntity<ApiResponse<UserDTO>> updateMyInfo(
+            // FIXME : jwttoken, refreshToeken을 헤더에 추가할 필요 없음
             @PathVariable int id) {
         userService.getUserByIdOrUserId(id);
         return ok(FrkConstants.getUser, userService.getUserByIdOrUserId(id));
     }
+
+
 
     /**
      * 새로운 사용자를 등록합니다.

@@ -23,19 +23,24 @@ public class UserService {
     private final UserMapper userMapper;
 
     /**
-     * 사용자 ID 또는 사용자명으로 사용자 정보를 조회합니다.
-     * @param param 사용자 ID 또는 사용자명
+     * user 정보 조회
+     * @param id
      * @return 조회된 사용자 정보
      */
-    public UserDTO getUserByIdOrUserId(int param){
+    public UserDTO getUser(int id){
         UserDTO userparam = new UserDTO();
-        userparam.setId(param);
+        userparam.setId(id);
         return userMapper.getUserByIdOrUserId(userparam);
     }
 
-    public UserDTO getUserByIdOrUserId(String param){
+    /**
+     * user 정보 조회
+     * @param userId
+     * @return
+     */
+    public UserDTO getUser(String userId){
         UserDTO userparam = new UserDTO();
-        userparam.setUserId(param);
+        userparam.setUserId(userId);
         return userMapper.getUserByIdOrUserId(userparam);
     }
 

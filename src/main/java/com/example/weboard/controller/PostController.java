@@ -33,7 +33,7 @@ public class PostController extends BaseController{
      * @return 게시물 목록과 상태 메시지를 담은 ResponseEntity
      */
     @Operation(summary = "모든 게시물을 오프셋 기준으로 n개씩 반환합니다.")
-    @PostMapping("/list")
+    @PostMapping("/public")
     public ResponseEntity<ApiResponse<List<PostDTO>>> getPostAllByOffset(
             @RequestBody @Valid BasePagingParam basePagingParam) {
         return ok(FrkConstants.getAllPost, postService.getPostAllByOffset(basePagingParam));

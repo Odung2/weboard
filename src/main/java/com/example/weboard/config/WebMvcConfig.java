@@ -34,7 +34,9 @@ public class WebMvcConfig  implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/weboard/**")
                 .excludePathPatterns("/weboard/users/signup")
+                .excludePathPatterns("/weboard/posts/public")
                 .excludePathPatterns("/weboard/users/login")
                 .excludePathPatterns("/weboard/posts/list");
+
     }
 }
