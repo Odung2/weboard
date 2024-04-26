@@ -17,11 +17,11 @@ public class OpenApiConfig {
                         .addSecuritySchemes("bearer-key", new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
-                                .bearerFormat("JWT"))
-                        .addSecuritySchemes("Refresh-token", new SecurityScheme()
-                                .type(SecurityScheme.Type.APIKEY)
-                                .in(SecurityScheme.In.HEADER)
-                                .name("Refresh-token")))
+                                .bearerFormat("JWT")))
+//                        .addSecuritySchemes("Refresh-token", new SecurityScheme()
+//                                .type(SecurityScheme.Type.APIKEY)
+//                                .in(SecurityScheme.In.HEADER)
+//                                .name("Refresh-token")))
                 .info(new Info().title("API Documentation").version("1.0.0"))
                 .addSecurityItem(new SecurityRequirement().addList("bearer-key"));
     }

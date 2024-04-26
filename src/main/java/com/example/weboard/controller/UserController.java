@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 
 @RequestMapping("/weboard/users")
 @RestController
@@ -36,6 +35,7 @@ public class UserController extends BaseController{
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(
             @RequestHeader("Authorization") String jwttoken,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
             @PathVariable int id) {
         userService.getUserByIdOrUserId(id);
         return ok(FrkConstants.getUser, userService.getUserByIdOrUserId(id));
@@ -56,15 +56,18 @@ public class UserController extends BaseController{
     /**
      * 특정 사용자 정보를 업데이트합니다.
      * Authorization 헤더를 통해 요청 인증을 수행하고, 사용자 정보를 업데이트합니다.
-     * @param jwttoken 인증을 위한 JWT 토큰
+     *
+     * @param jwttoken        인증을 위한 JWT 토큰
+     * @param refreshToken
      * @param updateUserParam 업데이트할 사용자의 데이터를 담은 DTO
-     * @param id 업데이트할 사용자의 ID
+     * @param id              업데이트할 사용자의 ID
      * @return 업데이트된 사용자 정보와 상태 메시지를 담은 ResponseEntity
      */
     @Operation(summary = "특정 사용자 정보를 업데이트", description = "특정 사용자 정보를 업데이트합니다.")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> updateUser(
             @RequestHeader("Authorization") String jwttoken,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
             @RequestBody @Valid UpdateUserParam updateUserParam,
             @PathVariable int id){
         return ok(FrkConstants.updateUser, userService.updateUser(updateUserParam, id));
@@ -81,6 +84,7 @@ public class UserController extends BaseController{
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Integer>> deleteUser(
             @RequestHeader("Authorization") String jwttoken,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
             @PathVariable int id){
         return ok(FrkConstants.deleteUser, userService.deleteUser(id));
     }

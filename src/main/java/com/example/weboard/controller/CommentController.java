@@ -48,7 +48,9 @@ public class CommentController extends BaseController{
     @Operation(summary = "특정 게시물에 새 댓글을 추가합니다.")
     @PostMapping("/{postId}")
     public ResponseEntity<ApiResponse<CommentDTO>> insertComment(
-            @RequestHeader("Authorization") String jwttoken, @PathVariable int postId, @RequestBody @Valid InsertCommentParam insertCommentParam){
+            @RequestHeader("Authorization") String jwttoken,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
+            @PathVariable int postId, @RequestBody @Valid InsertCommentParam insertCommentParam){
         return ok(FrkConstants.insertComment, commentService.insertComment(insertCommentParam, postId, jwttoken));
     }
 
@@ -63,7 +65,9 @@ public class CommentController extends BaseController{
     @Operation(summary = "기존 댓글을 업데이트합니다.")
     @PutMapping("/{commentId}")
     public ResponseEntity<ApiResponse<CommentDTO>> updateComment(
-            @RequestHeader("Authorization") String jwttoken, @PathVariable int commentId, @RequestBody @Valid UpdateCommentParam updateCommentParam){
+            @RequestHeader("Authorization") String jwttoken,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
+            @PathVariable int commentId, @RequestBody @Valid UpdateCommentParam updateCommentParam){
         return ok(FrkConstants.updateComment, commentService.updateComment(updateCommentParam, commentId));
     }
 
@@ -77,7 +81,9 @@ public class CommentController extends BaseController{
     @Operation(summary = "기존 댓글을 삭제합니다.")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Integer>> deleteComment(
-            @RequestHeader("Authorization") String jwttoken,  @PathVariable int commentId){
+            @RequestHeader("Authorization") String jwttoken,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
+            @PathVariable int commentId){
         return ok(FrkConstants.deleteComment, commentService.deleteComment(commentId));
     }
 

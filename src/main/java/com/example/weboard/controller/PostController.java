@@ -63,6 +63,7 @@ public class PostController extends BaseController{
     @PostMapping
     public ResponseEntity<ApiResponse<PostDTO>> insertPost(
             @RequestBody @Valid InsertPostParam insertPostParam,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
             @RequestHeader("Authorization") String jwttoken) {
         return ok(FrkConstants.insertPost, postService.insertPost(insertPostParam, jwttoken));
     }
@@ -79,6 +80,7 @@ public class PostController extends BaseController{
     @PutMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostDTO>> updatePost(
             @RequestHeader("Authorization") String jwttoken,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
             @PathVariable int postId,
             @RequestBody @Valid UpdatePostParam updatePostParam) {
         return ok(FrkConstants.updatePost, postService.updatePost(updatePostParam, postId, jwttoken));
@@ -94,7 +96,9 @@ public class PostController extends BaseController{
     @Operation(summary = "유저가 작성한 본인의 게시물을 삭제합니다.")
     @DeleteMapping("/{postId}")
     public ResponseEntity<ApiResponse<Integer>> deletePost(
-            @RequestHeader("Authorization") String jwttoken, @PathVariable int postId) throws BadRequestException {
+            @RequestHeader("Authorization") String jwttoken,
+            @RequestHeader(value="Refresh-token", defaultValue = "") String refreshToken,
+            @PathVariable int postId) throws BadRequestException {
         return ok(FrkConstants.deletePost, postService.deletePost(postId, jwttoken));
     }
 
