@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.aspectj.weaver.ast.Expr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -106,9 +107,8 @@ public class AuthService {
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(jwtToken);
-
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("토큰이 만료되었습니다.");
+            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "access token이 만료되었습니다. weboard/users/refreshToken 에서 새로운 액세스 토큰을 발급받으세요.");
         }
     }
 
@@ -119,38 +119,46 @@ public class AuthService {
      * @return 새로운 액세스 JWT를 반환합니다.
      * @throws RuntimeException JWT 검증 실패 시 예외를 던집니다.
      */
-    public String checkRefreshJWTValid(TokensParam tokensParam) throws RuntimeException {
-        String accessJWT = tokensParam.getAccessToken();
-        String refreshJWT = tokensParam.getRefreshToken();
+    public String checkRefreshJWTValid(String accessJWT, String refreshJWT) throws RuntimeException, TokenNotIssueException {
+        //입력 받은 토큰 가져오기
+//        String accessJWT = tokensParam.getAccessToken();
+//        String refreshJWT = tokensParam.getRefreshToken();
+
         if(StringUtils.isBlank(accessJWT) || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
             throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
         }
 
-        int id=0;
-        StringBuilder userId = new StringBuilder();
+        //redis에 존재하는 refresh token이 있는지 검사
         if((redisService.getValues(accessJWT)).equals(refreshJWT)){
             try {
+                //만약 refresh token이 존재한다면, refresh token이 유효한지 검사
                 extractJWTClaims(refreshJWT);
             } catch (ExpiredJwtException e1) {
-                throw new ExpiredJwtException(e1.getHeader(), e1.getClaims(), e1.getMessage());
+                //만약 refresh token도 만료되었다면 ExpiredJwtException
+                throw new ExpiredJwtException(e1.getHeader(), e1.getClaims(), "refresh token도 만료되었습니다. 다시 로그인 해주세요.");
             }
         }else{
-            throw new MalformedJwtException("access token에 해당하는 refresh token이 존재하지 않습니다.");
+            //refresh token이 존재하지 않음.
+            throw new NotFoundException("access token에 해당하는 refresh token이 존재하지 않습니다. 다시 로그인 해주세요.");
         }
 
         try {
-            // refresh token 유효성 확인 -> access token 재발급
+            // refresh token 유효성 확인 -> access token 재발급 위해 access token의 개인 정보 필요
             extractJWTClaims(accessJWT);
-        } catch (ExpiredJwtException e) {
-            id = Integer.parseInt(e.getClaims().getSubject());
-            userId.append(e.getClaims().get("userId", String.class));
-            // refresh token 유효성 확인 -> access token 재발급
-            redisService.deleteValues(accessJWT);
+        } catch (ExpiredJwtException e) { // access token은 만료되어야 새로 access token을 발급 해줌.(무한 발급 방지)
+            int id = Integer.parseInt(e.getClaims().getSubject());
+            String userId = e.getClaims().get("userId", String.class);
+
+            redisService.deleteValues(accessJWT); // 기존 accessJWT(key), refresh(value) 는 삭제
+
             String newAccessJWT = generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
-            redisService.setValues(newAccessJWT, refreshJWT);
+
+            redisService.setValues(newAccessJWT, refreshJWT); // redis에 새 조합 등록
             return newAccessJWT;
         }
-        throw new ;
+
+        // 만약 access token이 만료되지 않은 경우, access token을 발급하지 않음.
+        throw new TokenNotIssueException("액세스 토큰이 만료되지 않아 새 액세스 토큰을 발급할 수 없습니다.");
     }
     /**
      * 사용자 ID를 기반으로 액세스 JWT를 생성합니다.
@@ -184,6 +192,7 @@ public class AuthService {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
+
     /**
      * 사용자 정보를 기반으로 리프레시 JWT를 생성합니다.
      * @param user 사용자 정보
@@ -228,9 +237,9 @@ public class AuthService {
         try {
             return Integer.parseInt(extractJWTClaims(jwtToken).getBody().getSubject());
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("토큰이 만료되었습니다.");
-        } catch (JwtException e) {
-            throw new MalformedJwtException("토큰이 유효하지 않습니다.");
+            throw new RuntimeException("액세스 토큰이 만료되었습니다.");
+        } catch (MalformedJwtException e) {
+            throw new MalformedJwtException("액세스 토큰이 유효하지 않습니다.");
         }
     }
 
@@ -254,7 +263,7 @@ public class AuthService {
      * @throws Exception 검사 과정 중 발생할 수 있는 기타 예외
      */
     public boolean checkLastLoginAndLoginTrialMoreThan5(int id) throws Exception{
-        UserDTO user = userService.getUserByIdOrUserId(id);
+        UserDTO user = userService.getUser(id);
         Date currentDate = new Date();
 
         //로그인 5회 이상 실패 확인

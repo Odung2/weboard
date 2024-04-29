@@ -4,6 +4,7 @@ import com.example.weboard.dto.ApiResponse;
 import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.dto.PostDTO;
 import com.example.weboard.dto.PostViewBO;
+import com.example.weboard.exception.UnauthorizedAccessException;
 import com.example.weboard.param.BasePagingParam;
 import com.example.weboard.param.InsertPostParam;
 import com.example.weboard.param.UpdatePostParam;
@@ -46,10 +47,10 @@ public class PostController extends BaseController{
      * @return 조회된 게시물과 상태 메시지를 담은 ResponseEntity
      */
     @Operation(summary = "특정 게시물을 ID로 조회합니다.")
-    @GetMapping("/{postId}")
+    @GetMapping("/public/{postId}")
     public ResponseEntity<ApiResponse<PostViewBO>> getPostById(
             @PathVariable int postId) {
-        return ok(postService.getPostById(postId));
+        return ok(postService.getPostViewById(postId));
     }
 
     /**
@@ -62,8 +63,9 @@ public class PostController extends BaseController{
     @Operation(summary = "새로운 게시물을 추가합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<PostDTO>> insertPost(
+            @RequestAttribute("reqId") int id,
             @RequestBody @Valid InsertPostParam insertPostParam) {
-        return ok(postService.insertPost(insertPostParam, jwttoken));
+        return ok(postService.insertPost(insertPostParam, id));
     }
 
     /**
@@ -77,9 +79,10 @@ public class PostController extends BaseController{
     @Operation(summary = "유저가 작성한 본인의 게시물을 업데이트(수정)합니다.")
     @PutMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostDTO>> updatePost(
+            @RequestAttribute("reqId") int id,
             @PathVariable int postId,
-            @RequestBody @Valid UpdatePostParam updatePostParam) {
-        return ok(postService.updatePost(updatePostParam, postId, jwttoken));
+            @RequestBody @Valid UpdatePostParam updatePostParam) throws UnauthorizedAccessException {
+        return ok(postService.updatePost(updatePostParam, postId, id));
     }
 
     /**
@@ -92,8 +95,9 @@ public class PostController extends BaseController{
     @Operation(summary = "유저가 작성한 본인의 게시물을 삭제합니다.")
     @DeleteMapping("/{postId}")
     public ResponseEntity<ApiResponse<Integer>> deletePost(
-            @PathVariable int postId) throws BadRequestException {
-        return ok(postService.deletePost(postId, jwttoken));
+            @RequestAttribute("reqId") int id,
+            @PathVariable int postId) throws BadRequestException, UnauthorizedAccessException {
+        return ok(postService.deletePost(postId, id));
     }
 
 }

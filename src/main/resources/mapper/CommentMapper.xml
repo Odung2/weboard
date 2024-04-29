@@ -8,6 +8,10 @@
         SELECT * FROM comment WHERE post_id=#{postId}
     </select>
 
+    <select id="getCommentByCommentId" parameterType="int" resultType="com.example.weboard.dto.CommentDTO">
+        SELECT * FROM comment WHERE comment_id=#{commentId}
+    </select>
+
     <insert id="insert" parameterType="com.example.weboard.dto.CommentDTO">
         INSERT INTO comment (post_id, user_id, comment_text, created_by, updated_by, updated_at)
         VALUES ( #{postId}, #{userId}, #{commentText}, #{userId}, null, null)

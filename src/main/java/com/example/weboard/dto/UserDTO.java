@@ -4,8 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,6 +20,9 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
+//@Builder
+@SuperBuilder
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Schema(description = "사용자 정보를 나타내는 DTO")
 public class UserDTO extends BaseDTO{
@@ -51,4 +57,6 @@ public class UserDTO extends BaseDTO{
     @Schema(description = "로그인 잠금 일자")
     @LastModifiedDate
     private Date loginLocked;
+
+
 }

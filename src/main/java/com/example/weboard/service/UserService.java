@@ -8,6 +8,7 @@ import com.example.weboard.dto.UserDTO;
 import com.example.weboard.param.SignupParam;
 import com.example.weboard.param.UpdateUserParam;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -39,9 +40,11 @@ public class UserService {
      * @return
      */
     public UserDTO getUser(String userId){
-        UserDTO userparam = new UserDTO();
-        userparam.setUserId(userId);
-        return userMapper.getUserByIdOrUserId(userparam);
+
+        UserDTO user = UserDTO.builder()
+                .userId(userId)
+                .build();
+        return userMapper.getUserByIdOrUserId(user);
     }
 
     /**
@@ -105,14 +108,16 @@ public class UserService {
      */
     public UserDTO insertUser(SignupParam signupParam) throws Exception {
         String plainPassword = signupParam.getPassword();
-        UserDTO user = new UserDTO();
-        user.setUserId(signupParam.getUserId());
-        user.setNickname(signupParam.getNickname());
-        if(checkNewPwValid(plainPassword)){
-            String sha256Password = plainToSha256(plainPassword);
-            user.setPassword(sha256Password);
-            userMapper.insert(user);
-        };
+        // 비밀번호 regex 만족하는지 확인, 불만족시 PasswordRegexException
+        checkNewPwValid(plainPassword);
+        String sha256Password = plainToSha256(plainPassword);
+
+        UserDTO user = UserDTO.builder()
+                .nickname(signupParam.getNickname())
+                .password(sha256Password)
+                .build();
+
+        userMapper.insert(user);
         return user;
     }
 
@@ -122,16 +127,20 @@ public class UserService {
      * @param id 사용자 ID
      * @return 업데이트된 사용자 정보
      */
-    public UserDTO updateUser(UpdateUserParam updateUserParam, int id) {
-        UserDTO user = new UserDTO();
-        user.setId(id);
-        user.setNickname(updateUserParam.getNickname());
+    public UserDTO updateUser(UpdateUserParam updateUserParam, int id) throws Exception {
+//        UserDTO user = new UserDTO();
         String plainPassword = updateUserParam.getPassword();
-        if(plainPassword != null){
-            String sha256Password = plainToSha256(plainPassword);
-            user.setPassword(sha256Password);
-        }
-        user.setUpdatedAt(LocalDateTime.now());
+        // 비밀번호 regex 만족하는지 확인, 불만족시 PasswordRegexException
+        checkNewPwValid(plainPassword);
+        String sha256Password =plainToSha256(plainPassword);
+
+        UserDTO user = UserDTO.builder()
+                .id(id)
+                .nickname(updateUserParam.getNickname())
+                .password(sha256Password)
+                .updatedAt(LocalDateTime.now())
+                .build();
+
         userMapper.update(user);
         return user;
     }
@@ -150,12 +159,12 @@ public class UserService {
      * @param plaintext 평문 비밀번호
      * @return 해시된 비밀번호
      */
-    public String plainToSha256(String plaintext) {
+    public String plainToSha256(String plaintext) throws PasswordRegexException, NoSuchAlgorithmException {
         MessageDigest mdSHA256 = null;
         try {
             mdSHA256 = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new NoSuchAlgorithmException(e);
         }
         byte[] sha256Password = mdSHA256.digest(plaintext.getBytes(StandardCharsets.UTF_8));
         StringBuilder hexString = new StringBuilder();

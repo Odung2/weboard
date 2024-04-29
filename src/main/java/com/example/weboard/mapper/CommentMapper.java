@@ -8,7 +8,7 @@ import java.util.List;
 @Mapper
 public interface CommentMapper extends BaseMapper{
     List<CommentDTO> getCommentByPostId(int postId);
-
+    CommentDTO getCommentByCommentId(int commentId);
     @Override
     int insert(CommentDTO comment);
     @Override

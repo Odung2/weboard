@@ -1,0 +1,18 @@
+package com.example.weboard.exception;
+
+public class TokenNotIssueException extends Exception{
+
+    public TokenNotIssueException(){}
+
+    public TokenNotIssueException(String message){
+        super(message);
+    }
+
+    public TokenNotIssueException(Throwable throwable){
+        super(throwable);
+    }
+
+    public TokenNotIssueException(String message, Throwable throwable){
+        super(message, throwable);
+    }
+}

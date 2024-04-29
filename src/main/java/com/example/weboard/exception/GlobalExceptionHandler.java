@@ -85,8 +85,18 @@ public class GlobalExceptionHandler extends BaseController {
 
     @ExceptionHandler(GenerateNewAccessJWTException.class)
     public ResponseEntity<ApiResponse<Object>> handleGenerateNewAccessJWTException(GenerateNewAccessJWTException e){
-        //e.getMessage()는 access token
-        return nok(500,"발급한 새 Access 토큰으로 접속해주세요." , e.getMessage());
+        return ok("발급한 새 Access 토큰으로 접속해주세요." , e.getMessage());
     }
+
+    @ExceptionHandler(TokenNotIssueException.class)
+    public ResponseEntity<ApiResponse<Object>> handleTokenNotIssueExceptionException(TokenNotIssueException e){
+        //e.getMessage()는 access token 을 발급해줄 수 없다는 메시지
+        return nok(403, e.getMessage());
+    }
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthorizedAccessException(UnauthorizedAccessException e){
+        return nok(403, e.getMessage());
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package com.example.weboard.service;
 
+import com.example.weboard.exception.UnauthorizedAccessException;
 import com.example.weboard.mapper.CommentMapper;
 import com.example.weboard.dto.CommentDTO;
 import com.example.weboard.param.InsertCommentParam;
@@ -24,6 +25,10 @@ public class CommentService {
         return commentMapper.getCommentByPostId(postId);
     }
 
+    public CommentDTO getCommentByCommentId(int commentId){
+        return commentMapper.getCommentByCommentId(commentId);
+    }
+
     /**
      * 새로운 댓글을 추가합니다.
      * JWT 토큰에서 사용자 ID를 추출하고, 댓글에 게시물 ID와 사용자 ID를 설정한 후 데이터베이스에 삽입합니다.
@@ -32,12 +37,9 @@ public class CommentService {
      * @param jwttoken 요청자의 JWT 토큰
      * @return 데이터베이스에 삽입된 댓글 객체
      */
-    public CommentDTO insertComment(InsertCommentParam insertCommentParam, int postId, String jwttoken){
-        int id = authService.getIdFromToken(jwttoken);
+    public CommentDTO insertComment(InsertCommentParam insertCommentParam, int postId, int id){
         CommentDTO comment = new CommentDTO();
-
         comment.setCommentText(insertCommentParam.getCommentText());
-
         comment.setPostId(postId);
         comment.setUserId(id);
         commentMapper.insert(comment);
@@ -51,14 +53,18 @@ public class CommentService {
      * @param commentId 업데이트될 댓글의 ID
      * @return 데이터베이스에 업데이트된 댓글 객체
      */
-    public CommentDTO updateComment(UpdateCommentParam updateCommentParam, int commentId){
-        CommentDTO comment = new CommentDTO();
+    public CommentDTO updateComment(UpdateCommentParam updateCommentParam, int commentId, int id) throws UnauthorizedAccessException {
 
+        if(getCommentByCommentId(commentId).getCreatedBy() != id){ // 본인이 쓴 댓글이 아닐 경우
+            throw new UnauthorizedAccessException("타인의 댓글을 수정할 수 없습니다.");
+        }
+
+        CommentDTO comment = new CommentDTO();
         comment.setCommentText(updateCommentParam.getCommentText());
         comment.setUserId(updateCommentParam.getUserId());
         comment.setPostId(updateCommentParam.getPostId());
-
         comment.setCommentId(commentId);
+
         commentMapper.update(comment);
         return comment;
     }
@@ -69,7 +75,12 @@ public class CommentService {
      * @param commentId 삭제할 댓글의 ID
      * @return 삭제 결과 (성공 시 1, 실패 시 0)
      */
-    public int deleteComment(int commentId){
+    public int deleteComment(int commentId, int id) throws UnauthorizedAccessException {
+
+        if(getCommentByCommentId(commentId).getCreatedBy() != id){ // 본인이 쓴 댓글이 아닐 경우
+            throw new UnauthorizedAccessException("타인의 댓글을 삭제할 수 없습니다.");
+        }
+
         return commentMapper.delete(commentId);
     }
 

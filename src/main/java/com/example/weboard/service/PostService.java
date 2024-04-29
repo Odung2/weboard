@@ -1,6 +1,7 @@
 package com.example.weboard.service;
 
 import com.example.weboard.dto.PostViewBO;
+import com.example.weboard.exception.UnauthorizedAccessException;
 import com.example.weboard.mapper.PostMapper;
 import com.example.weboard.dto.PostDTO;
 import com.example.weboard.param.BasePagingParam;
@@ -36,27 +37,31 @@ public class PostService {
      * @param postId 조회할 게시글의 ID
      * @return 게시글과 댓글 정보를 포함한 PostViewBO 객체
      */
-    public PostViewBO getPostById(int postId){
+    public PostViewBO getPostViewById(int postId){
         PostViewBO postView = new PostViewBO();
         postView.setPost(postMapper.getPostById(postId));
         postView.setComment(commentService.getCommentByPostId(postId));
         return postView;
     }
 
+    public PostDTO getPostById(int postId){
+        return postMapper.getPostById(postId);
+    }
+
+
     /**
      * 새로운 게시물을 추가합니다.
      * JWT 토큰에서 사용자 ID를 추출하여 게시물의 생성자로 설정한 후 데이터베이스에 삽입합니다.
      * @param insertPostParam 삽입할 게시물 데이터
-     * @param jwttoken 요청자의 JWT 토큰
+     * @param id 요청자의 id
      * @return 데이터베이스에 삽입된 게시물 객체
      */
-    public PostDTO insertPost(InsertPostParam insertPostParam, String jwttoken){
-        Integer userId = authService.getIdFromToken(jwttoken);
+    public PostDTO insertPost(InsertPostParam insertPostParam, int id){
         PostDTO post = new PostDTO();
         post.setTitle(insertPostParam.getTitle());
         post.setContents(insertPostParam.getContents());
         post.setFileData(insertPostParam.getFileData());
-        post.setCreatedBy(userId);
+        post.setCreatedBy(id);
         postMapper.insert(post);
         return post;
     }
@@ -69,14 +74,17 @@ public class PostService {
      * @param jwttoken 요청자의 JWT 토큰
      * @return 데이터베이스에 업데이트된 게시물 객체
      */
-    public PostDTO updatePost(UpdatePostParam updatePostParam, int postId, String jwttoken){
+    public PostDTO updatePost(UpdatePostParam updatePostParam, int postId, int id) throws UnauthorizedAccessException {
+        if(getPostById(postId).getCreatedBy() != id){
+            throw new UnauthorizedAccessException("타인의 게시물을 수정할 수 없습니다.");
+        }
+
         PostDTO post = new PostDTO();
         post.setTitle(updatePostParam.getTitle());
         post.setContents(updatePostParam.getContents());
         post.setFileData(updatePostParam.getFileData());
         post.setPostId(postId);
-        Integer userId = authService.getIdFromToken(jwttoken);
-        post.setUpdatedBy(userId);
+        post.setUpdatedBy(id);
         postMapper.update(post);
         return post;
     }
@@ -89,10 +97,13 @@ public class PostService {
      * @return 삭제된 게시물의 수 (성공적으로 삭제되면 1)
      * @throws BadRequestException 게시물의 생성자가 아닌 경우 예외를 던집니다.
      */
-    public int deletePost(int postId, String jwttoken) throws BadRequestException {
+    public int deletePost(int postId, int id) throws BadRequestException, UnauthorizedAccessException {
+        if(getPostById(postId).getCreatedBy() != id){
+            throw new UnauthorizedAccessException("타인의 게시물을 수정할 수 없습니다.");
+        }
+
         int createdById = postMapper.getPostById(postId).getCreatedBy();
-        int idFromJwt = authService.getIdFromToken(jwttoken);
-        if(idFromJwt!=createdById){
+        if(id!=createdById){
             throw new BadRequestException("타인의 게시글은 삭제할 수 없습니다.");
         }
         return postMapper.delete(postId);

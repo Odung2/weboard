@@ -8,6 +8,7 @@ import com.example.weboard.param.UpdateCommentParam;
 import com.example.weboard.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
@@ -48,8 +49,10 @@ public class CommentController extends BaseController{
     @Operation(summary = "특정 게시물에 새 댓글을 추가합니다.")
     @PostMapping("/{postId}")
     public ResponseEntity<ApiResponse<CommentDTO>> insertComment(
-            @PathVariable int postId, @RequestBody @Valid InsertCommentParam insertCommentParam){
-        return ok(commentService.insertComment(insertCommentParam, postId, jwttoken));
+            @RequestAttribute("reqId") int id,
+            @PathVariable int postId,
+            @RequestBody @Valid InsertCommentParam insertCommentParam){
+        return ok(commentService.insertComment(insertCommentParam, postId, id));
     }
 
     /**
@@ -63,8 +66,10 @@ public class CommentController extends BaseController{
     @Operation(summary = "기존 댓글을 업데이트합니다.")
     @PutMapping("/{commentId}")
     public ResponseEntity<ApiResponse<CommentDTO>> updateComment(
-            @PathVariable int commentId, @RequestBody @Valid UpdateCommentParam updateCommentParam){
-        return ok(commentService.updateComment(updateCommentParam, commentId));
+            @RequestAttribute("reqId") int id,
+            @PathVariable int commentId,
+            @RequestBody @Valid UpdateCommentParam updateCommentParam) throws Exception{
+        return ok(commentService.updateComment(updateCommentParam, commentId, id));
     }
 
     /**
@@ -77,8 +82,9 @@ public class CommentController extends BaseController{
     @Operation(summary = "기존 댓글을 삭제합니다.")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Integer>> deleteComment(
-            @PathVariable int commentId){
-        return ok(commentService.deleteComment(commentId));
+            @RequestAttribute("reqId") int id,
+            @PathVariable int commentId) throws Exception {
+        return ok(commentService.deleteComment(commentId, id));
     }
 
 }
