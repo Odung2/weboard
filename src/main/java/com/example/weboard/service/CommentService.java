@@ -38,10 +38,12 @@ public class CommentService {
      * @return 데이터베이스에 삽입된 댓글 객체
      */
     public CommentDTO insertComment(InsertCommentParam insertCommentParam, int postId, int id){
+
         CommentDTO comment = new CommentDTO();
         comment.setCommentText(insertCommentParam.getCommentText());
         comment.setPostId(postId);
         comment.setUserId(id);
+
         commentMapper.insert(comment);
         return comment;
     }

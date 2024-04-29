@@ -36,17 +36,6 @@ public class AuthService {
     private int refreshJWTExpirationMs;
 
     /**
-     * JWT 토큰에서 사용자 ID를 추출하여 주어진 ID와 비교합니다.
-     * @param id 사용자 ID
-     * @param JWT 검증할 JWT 토큰
-     * @return JWT 토큰의 ID와 주어진 ID가 일치하면 true, 그렇지 않으면 false를 반환합니다.
-     */
-    public Boolean compareJwtToId(int id, String JWT){
-        int idFromJwt = getIdFromToken(JWT);
-        return idFromJwt == id;
-    }
-
-    /**
      * 사용자 로그인을 처리하고, JWT 토큰을 발급합니다.
      * @param loginParam userId & password
      * @return 발급된 액세스 토큰과 리프레시 토큰을 포함한 TokensDTO 객체
@@ -62,7 +51,7 @@ public class AuthService {
         String storedPassword = user.getPassword();
         String hashedPassword = userService.plainToSha256(loginParam.getPassword());
 
-        boolean valid = checkLastLoginAndLoginTrialMoreThan5(id);
+        checkLastLoginAndLoginTrialMoreThan5(id); // 로그인 시도 제한되지 않았는지 확인
 
         if (!storedPassword.equals(hashedPassword)) {
             int failCount = userService.addLoginFailCount(user);
@@ -86,7 +75,7 @@ public class AuthService {
 
         TokensDTO IssuedTokens = new TokensDTO();
         IssuedTokens.setAccessToken(generateAccessJWT(user));
-        IssuedTokens.setRefreshToken(generateRefreshJWT(user));
+        IssuedTokens.setRefreshToken(generateRefreshJWT());
 //        return generateAccessJWT(user);
         redisService.setValues(IssuedTokens.getAccessToken(), IssuedTokens.getRefreshToken());
         return IssuedTokens;
@@ -99,14 +88,11 @@ public class AuthService {
      */
     public void checkAccessJWTValid(String accessJWT){
         if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
-            throw new MalformedJwtException("dd");
+            throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
         }
         String jwtToken = accessJWT.substring(7);
         try {
-            Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(jwtToken);
+            extractJWTClaims(jwtToken);
         } catch (ExpiredJwtException e) {
             throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "access token이 만료되었습니다. weboard/users/refreshToken 에서 새로운 액세스 토큰을 발급받으세요.");
         }
@@ -120,9 +106,6 @@ public class AuthService {
      * @throws RuntimeException JWT 검증 실패 시 예외를 던집니다.
      */
     public String checkRefreshJWTValid(String accessJWT, String refreshJWT) throws RuntimeException, TokenNotIssueException {
-        //입력 받은 토큰 가져오기
-//        String accessJWT = tokensParam.getAccessToken();
-//        String refreshJWT = tokensParam.getRefreshToken();
 
         if(StringUtils.isBlank(accessJWT) || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
             throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
@@ -131,28 +114,25 @@ public class AuthService {
         //redis에 존재하는 refresh token이 있는지 검사
         if((redisService.getValues(accessJWT)).equals(refreshJWT)){
             try {
-                //만약 refresh token이 존재한다면, refresh token이 유효한지 검사
                 extractJWTClaims(refreshJWT);
             } catch (ExpiredJwtException e1) {
-                //만약 refresh token도 만료되었다면 ExpiredJwtException
                 throw new ExpiredJwtException(e1.getHeader(), e1.getClaims(), "refresh token도 만료되었습니다. 다시 로그인 해주세요.");
             }
         }else{
-            //refresh token이 존재하지 않음.
             throw new NotFoundException("access token에 해당하는 refresh token이 존재하지 않습니다. 다시 로그인 해주세요.");
         }
 
         try {
-            // refresh token 유효성 확인 -> access token 재발급 위해 access token의 개인 정보 필요
+            // access token 재발급 위해 access token의 개인 정보 필요
             extractJWTClaims(accessJWT);
-        } catch (ExpiredJwtException e) { // access token은 만료되어야 새로 access token을 발급 해줌.(무한 발급 방지)
+        } catch (ExpiredJwtException e) {
+            // access token은 만료되어야 새로 access token을 발급 해줌.(무한 발급 방지)
             int id = Integer.parseInt(e.getClaims().getSubject());
             String userId = e.getClaims().get("userId", String.class);
 
-            redisService.deleteValues(accessJWT); // 기존 accessJWT(key), refresh(value) 는 삭제
+            redisService.deleteValues(accessJWT); // 기존 accessJWT(key), refresh(value) pair는 redis에서 삭제
 
             String newAccessJWT = generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
-
             redisService.setValues(newAccessJWT, refreshJWT); // redis에 새 조합 등록
             return newAccessJWT;
         }
@@ -160,10 +140,10 @@ public class AuthService {
         // 만약 access token이 만료되지 않은 경우, access token을 발급하지 않음.
         throw new TokenNotIssueException("액세스 토큰이 만료되지 않아 새 액세스 토큰을 발급할 수 없습니다.");
     }
+
     /**
-     * 사용자 ID를 기반으로 액세스 JWT를 생성합니다.
-     * @param id 사용자 ID
-     * @param userId 사용자의 유저 ID
+     * 사용자 정보를 기반으로 액세스 JWT를 생성합니다.
+     * @param user 사용자 정보
      * @return 생성된 액세스 JWT
      */
     private String generateAccessJWT(UserDTO user) {
@@ -179,6 +159,12 @@ public class AuthService {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
+    /**
+     * 사용자의 id, userId를 기반으로 액세스 JWT를 생성합니다.
+     * @param id 사용자 ID
+     * @param userId 사용자의 유저 ID
+     * @return 생성된 액세스 JWT
+     */
     private String generateAccessJWT(int id, String userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessJWTExpirationMs);
@@ -194,11 +180,10 @@ public class AuthService {
     }
 
     /**
-     * 사용자 정보를 기반으로 리프레시 JWT를 생성합니다.
-     * @param user 사용자 정보
+     * 리프레시 JWT를 생성합니다. 리프레시 토큰에는 개인정보가 없습니다.
      * @return 생성된 리프레시 JWT
      */
-    private String generateRefreshJWT(UserDTO user) {
+    private String generateRefreshJWT() {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshJWTExpirationMs);
 
@@ -212,7 +197,7 @@ public class AuthService {
     }
 
     /**
-     * JWT에서 클레임을 추출합니다.
+     * JWT에서 클레임을 추출합니다.(for 유효성 검사)
      * @param BearerJWT 분석할 Bearer JWT
      * @return 추출된 JWT 클레임
      */
@@ -225,7 +210,7 @@ public class AuthService {
     }
 
     /**
-     * JWT에서 사용자 ID를 추출합니다.
+     * JWT에서 사용자의 id를 추출합니다.
      * @param JWT 검증할 JWT 토큰
      * @return 추출된 사용자 ID
      */
@@ -272,7 +257,6 @@ public class AuthService {
             // 5회 실패시 5분간 잠금
             if(user.getLoginFail()>=5 && lastLoginLockFromNow<5) throw new LoginLockException();
         }
-
 
         //마지막 로그인 확인
         // 마지막 로그인 날짜와 현재 날짜의 차이를 일 단위로 변환

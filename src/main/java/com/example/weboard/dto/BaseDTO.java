@@ -15,7 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
-@SuperBuilder
+//@SuperBuilder
 @EntityListeners(AuditingEntityListener.class)
 public class BaseDTO {
 

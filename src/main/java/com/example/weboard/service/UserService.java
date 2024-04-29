@@ -29,9 +29,15 @@ public class UserService {
      * @return 조회된 사용자 정보
      */
     public UserDTO getUser(int id){
-        UserDTO userparam = new UserDTO();
-        userparam.setId(id);
-        return userMapper.getUserByIdOrUserId(userparam);
+
+//        UserDTO user = UserDTO.setOnlyId()
+//                .id(id)
+//                .build();
+
+        UserDTO user = new UserDTO();
+        user.setId(id);
+
+        return userMapper.getUserByIdOrUserId(user);
     }
 
     /**
@@ -41,9 +47,13 @@ public class UserService {
      */
     public UserDTO getUser(String userId){
 
-        UserDTO user = UserDTO.builder()
-                .userId(userId)
-                .build();
+//        UserDTO user = UserDTO.setOnlyUserId()
+//                .userId(userId)
+//                .build();
+
+        UserDTO user = new UserDTO();
+        user.setUserId(userId);
+
         return userMapper.getUserByIdOrUserId(user);
     }
 
@@ -108,14 +118,17 @@ public class UserService {
      */
     public UserDTO insertUser(SignupParam signupParam) throws Exception {
         String plainPassword = signupParam.getPassword();
-        // 비밀번호 regex 만족하는지 확인, 불만족시 PasswordRegexException
         checkNewPwValid(plainPassword);
         String sha256Password = plainToSha256(plainPassword);
 
-        UserDTO user = UserDTO.builder()
-                .nickname(signupParam.getNickname())
-                .password(sha256Password)
-                .build();
+//        UserDTO user = UserDTO.setSignupForm()
+//                .nickname(signupParam.getNickname())
+//                .password(sha256Password)
+//                .build();
+
+        UserDTO user = new UserDTO();
+        user.setNickname(signupParam.getNickname());
+        user.setPassword(sha256Password);
 
         userMapper.insert(user);
         return user;
@@ -128,18 +141,21 @@ public class UserService {
      * @return 업데이트된 사용자 정보
      */
     public UserDTO updateUser(UpdateUserParam updateUserParam, int id) throws Exception {
-//        UserDTO user = new UserDTO();
         String plainPassword = updateUserParam.getPassword();
-        // 비밀번호 regex 만족하는지 확인, 불만족시 PasswordRegexException
         checkNewPwValid(plainPassword);
         String sha256Password =plainToSha256(plainPassword);
 
-        UserDTO user = UserDTO.builder()
-                .id(id)
-                .nickname(updateUserParam.getNickname())
-                .password(sha256Password)
-                .updatedAt(LocalDateTime.now())
-                .build();
+//        UserDTO user = UserDTO.updateUser()
+//                .id(id)
+//                .nickname(updateUserParam.getNickname())
+//                .password(sha256Password)
+//                .build();
+
+        UserDTO user = new UserDTO();
+        user.setId(id);
+        user.setNickname(updateUserParam.getNickname());
+        user.setPassword(sha256Password);
+        user.setUpdatedAt(LocalDateTime.now()); // 상속받은 필드는 builder 패턴 사용이 어려움...
 
         userMapper.update(user);
         return user;
@@ -159,7 +175,7 @@ public class UserService {
      * @param plaintext 평문 비밀번호
      * @return 해시된 비밀번호
      */
-    public String plainToSha256(String plaintext) throws PasswordRegexException, NoSuchAlgorithmException {
+    public String plainToSha256(String plaintext) throws NoSuchAlgorithmException {
         MessageDigest mdSHA256 = null;
         try {
             mdSHA256 = MessageDigest.getInstance("SHA-256");
@@ -179,7 +195,7 @@ public class UserService {
     }
 
     /**
-     * 새 비밀번호의 유효성을 검사합니다.
+     * 비밀번호 regex 만족하는지 확인, 불만족시 PasswordRegexException
      * @param password 검사할 비밀번호
      * @return 검사 결과
      * @throws Exception 비밀번호 길이 또는 형식 불일치로 인한 예외 발생

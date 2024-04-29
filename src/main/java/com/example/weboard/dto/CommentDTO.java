@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 @NoArgsConstructor
-@Builder
-@AllArgsConstructor
+//@Builder
+//@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Schema(description = "댓글 정보를 담는 DTO")
 public class CommentDTO extends BaseDTO {

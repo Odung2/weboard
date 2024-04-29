@@ -38,9 +38,11 @@ public class PostService {
      * @return 게시글과 댓글 정보를 포함한 PostViewBO 객체
      */
     public PostViewBO getPostViewById(int postId){
+
         PostViewBO postView = new PostViewBO();
         postView.setPost(postMapper.getPostById(postId));
         postView.setComment(commentService.getCommentByPostId(postId));
+
         return postView;
     }
 
@@ -57,11 +59,13 @@ public class PostService {
      * @return 데이터베이스에 삽입된 게시물 객체
      */
     public PostDTO insertPost(InsertPostParam insertPostParam, int id){
+
         PostDTO post = new PostDTO();
         post.setTitle(insertPostParam.getTitle());
         post.setContents(insertPostParam.getContents());
         post.setFileData(insertPostParam.getFileData());
         post.setCreatedBy(id);
+
         postMapper.insert(post);
         return post;
     }
@@ -75,6 +79,7 @@ public class PostService {
      * @return 데이터베이스에 업데이트된 게시물 객체
      */
     public PostDTO updatePost(UpdatePostParam updatePostParam, int postId, int id) throws UnauthorizedAccessException {
+
         if(getPostById(postId).getCreatedBy() != id){
             throw new UnauthorizedAccessException("타인의 게시물을 수정할 수 없습니다.");
         }
@@ -85,6 +90,7 @@ public class PostService {
         post.setFileData(updatePostParam.getFileData());
         post.setPostId(postId);
         post.setUpdatedBy(id);
+
         postMapper.update(post);
         return post;
     }
@@ -98,14 +104,11 @@ public class PostService {
      * @throws BadRequestException 게시물의 생성자가 아닌 경우 예외를 던집니다.
      */
     public int deletePost(int postId, int id) throws BadRequestException, UnauthorizedAccessException {
+
         if(getPostById(postId).getCreatedBy() != id){
             throw new UnauthorizedAccessException("타인의 게시물을 수정할 수 없습니다.");
         }
 
-        int createdById = postMapper.getPostById(postId).getCreatedBy();
-        if(id!=createdById){
-            throw new BadRequestException("타인의 게시글은 삭제할 수 없습니다.");
-        }
         return postMapper.delete(postId);
     }
 

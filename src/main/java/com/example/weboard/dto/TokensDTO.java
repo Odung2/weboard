@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 @NoArgsConstructor
-@Builder
-@AllArgsConstructor
+//@Builder
+//@AllArgsConstructor
 //@RedisHash(value="token", timeToLive = 7200000)
 @Schema(description = "토큰 정보를 나타내는 DTO")
 public class TokensDTO {
