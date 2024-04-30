@@ -70,7 +70,7 @@ public class GlobalExceptionHandler extends BaseController {
 
     @ExceptionHandler(LastPwException.class)
     public ResponseEntity<ApiResponse<Object>> handleLastPwException(LastPwException e){
-        return nok(403, "비밀번호를 변경한지 3개월이 지났습니다. 보안을 위해 비밀번호를 변경해주세요.", null);
+        return nok(403, "비밀번호를 변경한지 3개월이 지났습니다. 보안을 위해 비밀번호를 변경해주세요.", e.getMessage());
     }
 
     @ExceptionHandler(LastLoginException.class)

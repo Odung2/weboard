@@ -127,6 +127,7 @@ public class UserService {
 //                .build();
 
         UserDTO user = new UserDTO();
+        user.setUserId(signupParam.getUserId());
         user.setNickname(signupParam.getNickname());
         user.setPassword(sha256Password);
 

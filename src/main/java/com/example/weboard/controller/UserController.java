@@ -119,7 +119,7 @@ public class UserController extends BaseController{
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokensDTO>> login(
             @RequestBody @Valid LoginParam loginParam) throws Exception{
-        return ok(authService.loginAndJwtProvide(loginParam));
+        return ok(authService.loginAndIssueTokens(loginParam));
     }
 
 

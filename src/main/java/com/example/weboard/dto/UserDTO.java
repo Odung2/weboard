@@ -23,7 +23,7 @@ import java.util.Date;
 //@Builder
 //@SuperBuilder
 //@AllArgsConstructor
-@SuperBuilder(builderMethodName = "updateUser")
+//@SuperBuilder(builderMethodName = "updateUser")
 @EntityListeners(AuditingEntityListener.class)
 @Schema(description = "사용자 정보를 나타내는 DTO")
 public class UserDTO extends BaseDTO{

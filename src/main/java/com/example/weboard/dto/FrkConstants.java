@@ -19,4 +19,6 @@ public class FrkConstants {
     public static final int lockUser = 1;
     public static final int unlockUser = 0;
 
+    public static final int month = 31;
+
 }
