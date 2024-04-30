@@ -40,7 +40,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No Authorization token provided");
             return false;
         }
-        authService.validateAccessTokenClaim(authService.validateAccessTokenFormat(accessJWT));
+        authService.validateAccessToken(accessJWT);
         int id = authService.getIdFromToken(accessJWT);
         request.setAttribute("reqId", id);
         //RequestContextHolder.

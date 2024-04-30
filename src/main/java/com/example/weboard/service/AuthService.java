@@ -63,7 +63,6 @@ public class AuthService {
         return issueTokens;
     }
 
-
     /**
      * DB에 저장된 유저의 비밀번호 일치 확인, 실패 시 로그인 실패 횟수 +1
      * @param user // DB에 저장된 유저 정보
@@ -155,51 +154,84 @@ public class AuthService {
         }
     }
 
-//    /**
-//     * access 토큰의 유효성 확인
-//     * @param accessJWT
-//     */
-//    public void checkAccessJWTValid(String accessJWT){
-//        if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
-//            throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
-//        }
-//        String jwtToken = accessJWT.substring(7);
-//        try {
-//            extractJWTClaims(jwtToken);
-//        } catch (ExpiredJwtException e) {
-//            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "access token이 만료되었습니다. 새로운 액세스 토큰을 발급받으세요.");
-//        }
-//    }
 
     /**
-     * 액세스 JWT와 리프레시 JWT의 유효성을 검증하고, 필요에 따라 액세스 JWT를 재발급합니다.
-     * @param accessJWT 검증할 액세스 JWT
-     * @param refreshJWT 검증할 리프레시 JWT
-     * @return 새로운 액세스 JWT를 반환합니다.
-     * @throws RuntimeException JWT 검증 실패 시 예외를 던집니다.
+     * 액세스 토큰과 리프레시 토큰을 받고 유효성 검증 후 새 액세스 토큰 발급
+     * @param accessJWT
+     * @param refreshJWT
+     * @return newAccessToken
+     * @throws RuntimeException
+     * @throws TokenNotIssueException
      */
-    public String checkRefreshJWTValid(String accessJWT, String refreshJWT) throws RuntimeException, TokenNotIssueException {
-
-        validateAccessTokenFormat(accessJWT);
-        validateRefreshToken(accessJWT, refreshJWT);
-        return attemptReissueAccessToken(accessJWT, refreshJWT);
+    public String issueNewAccessToken(String accessJWT, String refreshJWT) throws RuntimeException, TokenNotIssueException {
+        // access token은 어차피 만료이므로 format만 먼저 확인
+        String onlyJWT = validateAccessTokenFormat(accessJWT);
+        // access token - refresh token pair가 redis에 존재하는지 확인, refresh token 유효 확인
+        validateRefreshToken(onlyJWT, refreshJWT);
+        // refresh token 유효, redis에 존재하고, access token 만료 시 새 액세스 토큰 발급
+        return attemptReissueAccessToken(onlyJWT, refreshJWT);
     }
 
+    /**
+     * Jwt Interceptor 에서 액세스 토큰 검증
+     * @param accessJWT
+     */
+    public void validateAccessToken(String accessJWT) {
+        validateAccessTokenClaim(validateAccessTokenFormat(accessJWT));
+    }
+
+    /**
+     * 액세스 토큰 format 검증. 액세스 토큰은 "Bearer "로 와야 함
+     * @param accessJWT
+     * @return
+     * @throws MalformedJwtException
+     */
     public String validateAccessTokenFormat(String accessJWT) throws MalformedJwtException {
         if(StringUtils.isBlank(accessJWT) || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
             throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
         }
-        return accessJWT.substring(7);
+        String jwt = accessJWT.substring(7);
+        // 만약 "Bearer "로 토큰을 보내면  "" 만 다음 로직으로 전달되는 것을 방지
+        if (jwt.isBlank()) {
+            throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
+        }
+        return jwt;
     }
 
+    /**
+     * 리프레시 토큰의 만료/유효성 확인
+     * @param refreshJWT
+     */
+    public void validateRefreshTokenClaim(String refreshJWT) {
+        validateTokenClaim(refreshJWT, "refresh token이 만료되었습니다. 다시 로그인해주세요.");
+    }
+
+    /**
+     * 액세스 토큰의 만료/유효성 확인
+     * @param accessJWT
+     */
     public void validateAccessTokenClaim(String accessJWT) {
+        validateTokenClaim(accessJWT, "access token이 만료되었습니다. 새로운 액세스 토큰을 발급받으세요.");
+    }
+
+    /**
+     * 전달받은 토큰의 만료/유효성 확인, 만료 시 전달받은 문구로 예외 처리(access/refresh 문구)
+     * @param jwt
+     * @param errorMessage
+     */
+    public void validateTokenClaim(String jwt, String errorMessage) {
         try {
-            extractJWTClaims(accessJWT);
+            extractJWTClaims(jwt);
         } catch (ExpiredJwtException e) {
-            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "access token이 만료되었습니다. 새로운 액세스 토큰을 발급받으세요.");
+            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), errorMessage);
         }
     }
 
+    /**
+     * redis에 저장된 리프레시 토큰, 입력받은 리프레시 토큰 검증, 리프레시 토큰 만료 확인
+     * @param accessJWT
+     * @param refreshJWT
+     */
     public void validateRefreshToken(String accessJWT, String refreshJWT) {
         // redis에 저장된 refresh token 가져오기
         String storedRefreshJWT = redisService.getValues(accessJWT);
@@ -211,14 +243,13 @@ public class AuthService {
         validateRefreshTokenClaim(refreshJWT);
     }
 
-    public void validateRefreshTokenClaim(String refreshJWT) {
-        try {
-            extractJWTClaims(refreshJWT);
-        } catch (ExpiredJwtException e) {
-            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "refresh token이 만료되었습니다. 다시 로그인해주세요.");
-        }
-    }
-
+    /**
+     * 액세스 토큰, 리프레시 토큰 재발급 시도, 만약 액세스 토큰 유효하면 발급 불가능
+     * @param accessJWT
+     * @param refreshJWT
+     * @return
+     * @throws TokenNotIssueException
+     */
     public String attemptReissueAccessToken(String accessJWT, String refreshJWT) throws TokenNotIssueException {
         try {
             extractJWTClaims(accessJWT);
@@ -228,6 +259,12 @@ public class AuthService {
         throw new TokenNotIssueException("액세스 토큰이 만료되지 않아 새 액세스 토큰을 발급할 수 없습니다.");
     }
 
+    /**
+     * 새 액세스 토큰 발급, redis에 반영
+     * @param e
+     * @param refreshJWT
+     * @return
+     */
     public String reissueAccessToken(ExpiredJwtException e, String refreshJWT) {
         // access token은 만료되어야 새로 access token을 발급 해줌.(무한 발급 방지)
         int id = Integer.parseInt(e.getClaims().getSubject());
@@ -241,9 +278,9 @@ public class AuthService {
     }
 
     /**
-     * 사용자 정보를 기반으로 액세스 JWT를 생성합니다.
-     * @param user 사용자 정보
-     * @return 생성된 액세스 JWT
+     * 사용자 정보 기반 액세스 토큰 생성
+     * @param user 이 중 [id, userId]를 토큰에 반영
+     * @return accessJWT
      */
     private String generateAccessJWT(UserDTO user) {
         Date now = new Date();
@@ -259,10 +296,10 @@ public class AuthService {
                 .compact();
     }
     /**
-     * 사용자의 id, userId를 기반으로 액세스 JWT를 생성합니다.
-     * @param id 사용자 ID
-     * @param userId 사용자의 유저 ID
-     * @return 생성된 액세스 JWT
+     * 사용자 id, userId 기반 액세스 토큰 생성
+     * @param id id
+     * @param userId userId
+     * @return accessJWT
      */
     private String generateAccessJWT(int id, String userId) {
         Date now = new Date();
@@ -279,8 +316,8 @@ public class AuthService {
     }
 
     /**
-     * 리프레시 JWT를 생성합니다. 리프레시 토큰에는 개인정보가 없습니다.
-     * @return 생성된 리프레시 JWT
+     * 리프레시 토큰 생성 - 개인정보 없음
+     * @return refreshJWT
      */
     private String generateRefreshJWT() {
         Date now = new Date();
@@ -296,21 +333,21 @@ public class AuthService {
     }
 
     /**
-     * JWT에서 클레임을 추출합니다.(for 유효성 검사)
-     * @param BearerJWT 분석할 Bearer JWT
+     * JWT에서 클레임 추출(for 유효성 검사)
+     * @param JWT 분석할 JWT("Bearer " 삭제된 것)
      * @return 추출된 JWT 클레임
      */
-    public Jws<Claims> extractJWTClaims(String BearerJWT){
+    public Jws<Claims> extractJWTClaims(String JWT){
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
-                .parseClaimsJws(BearerJWT);
+                .parseClaimsJws(JWT);
     }
 
     /**
-     * JWT에서 사용자의 id를 추출합니다.
+     * JWT애서 사용자의 id 추출
      * @param JWT 검증할 JWT 토큰
-     * @return 추출된 사용자 ID
+     * @return id
      */
     public Integer getIdFromToken(String JWT) {
         if (JWT == null || !JWT.startsWith("Bearer ")) {

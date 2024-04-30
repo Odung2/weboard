@@ -67,7 +67,7 @@ public class UserController extends BaseController{
             @RequestHeader("Authorization") String accessJWT,
             @RequestHeader(value="Refresh-token", defaultValue = "") String refreshJWT
             ) throws Exception {
-        return ok("새로 발급된 액세스 토큰으로 접속해주세요.", authService.checkRefreshJWTValid(accessJWT, refreshJWT));
+        return ok("새로 발급된 액세스 토큰으로 접속해주세요.", authService.issueNewAccessToken(accessJWT, refreshJWT));
     }
 
     /**
