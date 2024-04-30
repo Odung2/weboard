@@ -38,15 +38,15 @@ public class AuthService {
     private int refreshJWTExpirationMs;
 
     /**
-     * 사용자 로그인을 처리하고, JWT 토큰을 발급합니다.
-     * @param loginParam userId & password
-     * @return 발급된 액세스 토큰과 리프레시 토큰을 포함한 TokensDTO 객체
-     * @throws Exception 로그인 처리 중 발생하는 예외를 던집니다.
+     * 로그인(credential 확인) 및 [액세스 토큰, 리프레시 토큰] 발급
+     * @param loginParam [userId, password]
+     * @return issueTokens[accessJWT, refreshJWT]
+     * @throws Exception
      */
     public TokensDTO loginAndIssueTokens(LoginParam loginParam) throws Exception { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
 
         // DB에 저장된 유저 정보 존재 확인
-        UserDTO user = validateUser(loginParam.getUserId());
+        UserDTO user = userService.validateUser(loginParam.getUserId());
         // 로그인 시도 제한 확인
         validateLoginAttempts(user);
         // 비밀번호 확인 - 실제 로그인
@@ -57,25 +57,12 @@ public class AuthService {
         validateLastLogin(user);
         // 토큰s 발급
         TokensDTO issueTokens = issueTokens(user);
-        // 3개월 이상 비번 변경 x -> 비번 변경 에러 + 토큰s
+        // 3개월 이상 비번 변경 x -> 비번 변경 에러 + 토큰s 발급
         validateLastPwUpdate(user, issueTokens);
 
         return issueTokens;
     }
 
-    /**
-     * DB에 저장된 유저 정보가 존재하는지 확인하고, 유저 정보를 반환
-     * @param userId
-     * @return user
-     * @throws NotFoundException // 유저 정보가 존재하지 않음.
-     */
-    public UserDTO validateUser(String userId) throws NotFoundException {
-        UserDTO user = userService.getUser(userId);
-        if (user == null) {
-            throw new NotFoundException("사용자를 찾을 수 없습니다.");
-        }
-        return user;
-    }
 
     /**
      * DB에 저장된 유저의 비밀번호 일치 확인, 실패 시 로그인 실패 횟수 +1
@@ -168,22 +155,21 @@ public class AuthService {
         }
     }
 
-    /**
-     * 액세스 JWT의 유효성을 검증합니다.
-     * @param accessJWT 검증할 액세스 JWT
-     * @throws MalformedJwtException JWT 형식이 잘못되었을 때 예외를 던집니다.
-     */
-    public void checkAccessJWTValid(String accessJWT){
-        if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
-            throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
-        }
-        String jwtToken = accessJWT.substring(7);
-        try {
-            extractJWTClaims(jwtToken);
-        } catch (ExpiredJwtException e) {
-            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "access token이 만료되었습니다. weboard/users/refreshToken 에서 새로운 액세스 토큰을 발급받으세요.");
-        }
-    }
+//    /**
+//     * access 토큰의 유효성 확인
+//     * @param accessJWT
+//     */
+//    public void checkAccessJWTValid(String accessJWT){
+//        if(accessJWT == null || !accessJWT.startsWith("Bearer ") ) { // 7자 이상 조건도 만족
+//            throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
+//        }
+//        String jwtToken = accessJWT.substring(7);
+//        try {
+//            extractJWTClaims(jwtToken);
+//        } catch (ExpiredJwtException e) {
+//            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "access token이 만료되었습니다. 새로운 액세스 토큰을 발급받으세요.");
+//        }
+//    }
 
     /**
      * 액세스 JWT와 리프레시 JWT의 유효성을 검증하고, 필요에 따라 액세스 JWT를 재발급합니다.
@@ -194,37 +180,64 @@ public class AuthService {
      */
     public String checkRefreshJWTValid(String accessJWT, String refreshJWT) throws RuntimeException, TokenNotIssueException {
 
+        validateAccessTokenFormat(accessJWT);
+        validateRefreshToken(accessJWT, refreshJWT);
+        return attemptReissueAccessToken(accessJWT, refreshJWT);
+    }
+
+    public String validateAccessTokenFormat(String accessJWT) throws MalformedJwtException {
         if(StringUtils.isBlank(accessJWT) || !accessJWT.startsWith("Bearer ")) { // 7자 이상 조건도 만족
             throw new MalformedJwtException("유효하지 않은 토큰 형식입니다.");
         }
+        return accessJWT.substring(7);
+    }
 
-        //redis에 존재하는 refresh token이 있는지 검사
-        if((redisService.getValues(accessJWT)).equals(refreshJWT)){
-            try {
-                extractJWTClaims(refreshJWT);
-            } catch (ExpiredJwtException e1) {
-                throw new ExpiredJwtException(e1.getHeader(), e1.getClaims(), "refresh token도 만료되었습니다. 다시 로그인 해주세요.");
-            }
-        }else{
-            throw new NotFoundException("access token에 해당하는 refresh token이 존재하지 않습니다. 다시 로그인 해주세요.");
-        }
-
+    public void validateAccessTokenClaim(String accessJWT) {
         try {
-            // access token 재발급 위해 access token의 개인 정보 필요
             extractJWTClaims(accessJWT);
         } catch (ExpiredJwtException e) {
-            // access token은 만료되어야 새로 access token을 발급 해줌.(무한 발급 방지)
-            int id = Integer.parseInt(e.getClaims().getSubject());
-            String userId = e.getClaims().get("userId", String.class);
-
-            redisService.deleteValues(accessJWT); // 기존 accessJWT(key), refresh(value) pair는 redis에서 삭제
-
-            String newAccessJWT = generateAccessJWT(id, String.valueOf(userId)); // 새로운 Access JWT 발급
-            redisService.setValues(newAccessJWT, refreshJWT); // redis에 새 조합 등록
-            return newAccessJWT;
+            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "access token이 만료되었습니다. 새로운 액세스 토큰을 발급받으세요.");
         }
-        // 만약 access token이 만료되지 않은 경우, access token을 발급하지 않음.
+    }
+
+    public void validateRefreshToken(String accessJWT, String refreshJWT) {
+        // redis에 저장된 refresh token 가져오기
+        String storedRefreshJWT = redisService.getValues(accessJWT);
+
+        // redis와 입력받은 refresh token이 일치하지 않는 경우
+        if(!refreshJWT.equals(storedRefreshJWT)) throw new NotFoundException("access token에 해당하는 refresh token이 존재하지 않습니다. 다시 로그인 해주세요.");
+
+        // refresh token도 만료되지 않았는지 확인
+        validateRefreshTokenClaim(refreshJWT);
+    }
+
+    public void validateRefreshTokenClaim(String refreshJWT) {
+        try {
+            extractJWTClaims(refreshJWT);
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "refresh token이 만료되었습니다. 다시 로그인해주세요.");
+        }
+    }
+
+    public String attemptReissueAccessToken(String accessJWT, String refreshJWT) throws TokenNotIssueException {
+        try {
+            extractJWTClaims(accessJWT);
+        } catch (ExpiredJwtException e) {
+            return reissueAccessToken(e, refreshJWT);
+        }
         throw new TokenNotIssueException("액세스 토큰이 만료되지 않아 새 액세스 토큰을 발급할 수 없습니다.");
+    }
+
+    public String reissueAccessToken(ExpiredJwtException e, String refreshJWT) {
+        // access token은 만료되어야 새로 access token을 발급 해줌.(무한 발급 방지)
+        int id = Integer.parseInt(e.getClaims().getSubject());
+        String userId = e.getClaims().get("userId", String.class);
+        //FIXME: getId가 accesstoken이랑 동일한지 확인 필요
+        redisService.deleteValues(e.getClaims().getId()); // 기존 accessJWT(key), refresh(value) pair는 redis에서 삭제
+
+        String newAccessJWT = generateAccessJWT(id, userId); // 새로운 Access JWT 발급
+        redisService.setValues(newAccessJWT, refreshJWT); // redis에 새 조합 등록
+        return newAccessJWT;
     }
 
     /**

@@ -33,8 +33,8 @@ public class WebMvcConfig  implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/weboard/**")
-                .excludePathPatterns("/weboard/users/**") // /{id}, /signup, /login, /refreshToken 제외
-                .addPathPatterns("/weboard/users/myInfo/**") // 개인정보 관련 작업 access token 필요
+                .excludePathPatterns("/weboard/users/public/**") // signup, login, refresh-token, {id}
+//                .addPathPatterns("/weboard/users/my-info") // 개인정보 관련 작업 access token 필요
                 .excludePathPatterns("/weboard/posts/public/**") // post/public/** 관련은 제외
         ;
 

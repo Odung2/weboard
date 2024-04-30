@@ -29,21 +29,18 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String requestURL = request.getRequestURL().toString();
+
         // FIXME : request uri를 사용해야한다.
         // FIXME : api uri를 따로 만드는것이 더 좋음
 
         String accessJWT = request.getHeader("Authorization");
 //        String refreshJWT = request.getHeader("Refresh-token");
 
-        if(!StringUtils.isBlank(accessJWT) ){ // access token만 확인
-            authService.checkAccessJWTValid(accessJWT);
+        if(StringUtils.isBlank(accessJWT) ){ // access token만 확인
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No Authorization token provided");
+            return false;
         }
-//        else{
-//            String newAccessToken=authService.checkRefreshJWTValid(accessJWT, refreshJWT);
-//            if (newAccessToken != null && !newAccessToken.isEmpty()) {
-//                throw new GenerateNewAccessJWTException(newAccessToken); // 새로 access token 발급 됨
-//            }
-//        }
+        authService.validateAccessTokenClaim(authService.validateAccessTokenFormat(accessJWT));
         int id = authService.getIdFromToken(accessJWT);
         request.setAttribute("reqId", id);
         //RequestContextHolder.

@@ -10,6 +10,7 @@ import com.example.weboard.param.UpdateUserParam;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -24,45 +25,12 @@ public class UserService {
     private final UserMapper userMapper;
 
     /**
-     * user 정보 조회
-     * @param id
-     * @return 조회된 사용자 정보
-     */
-    public UserDTO getUser(int id){
-
-//        UserDTO user = UserDTO.setOnlyId()
-//                .id(id)
-//                .build();
-
-//        UserDTO user = new UserDTO();
-//        user.setId(id);
-
-        return userMapper.getUserById(id);
-    }
-
-    /**
-     * user 정보 조회
-     * @param userId
-     * @return
-     */
-    public UserDTO getUser(String userId){
-
-//        UserDTO user = UserDTO.setOnlyUserId()
-//                .userId(userId)
-//                .build();
-
-        UserDTO user = new UserDTO();
-        user.setUserId(userId);
-
-        return userMapper.getUserByIdOrUserId(user);
-    }
-
-    /**
      * 사용자 ID를 통해 비밀번호를 조회합니다.
      * @param id 사용자 ID
      * @return 해당 사용자의 비밀번호
      */
     public String getPasswordById(int id) {
+        validateUser(id);
         return userMapper.getPasswordById(id);
     }
 
@@ -121,11 +89,6 @@ public class UserService {
         checkNewPwValid(plainPassword);
         String sha256Password = plainToSha256(plainPassword);
 
-//        UserDTO user = UserDTO.setSignupForm()
-//                .nickname(signupParam.getNickname())
-//                .password(sha256Password)
-//                .build();
-
         UserDTO user = new UserDTO();
         user.setUserId(signupParam.getUserId());
         user.setNickname(signupParam.getNickname());
@@ -142,15 +105,16 @@ public class UserService {
      * @return 업데이트된 사용자 정보
      */
     public UserDTO updateUser(UpdateUserParam updateUserParam, int id) throws Exception {
-        String plainPassword = updateUserParam.getPassword();
-        checkNewPwValid(plainPassword);
-        String sha256Password =plainToSha256(plainPassword);
+        validateUser(id);
 
-//        UserDTO user = UserDTO.updateUser()
-//                .id(id)
-//                .nickname(updateUserParam.getNickname())
-//                .password(sha256Password)
-//                .build();
+        String plainPassword = updateUserParam.getPassword();
+        String sha256Password = "";
+        if(plainPassword!=null) {
+            checkNewPwValid(plainPassword);
+            sha256Password += plainToSha256(plainPassword);
+        } else {
+            sha256Password = null;
+        }
 
         UserDTO user = new UserDTO();
         user.setId(id);
@@ -168,6 +132,7 @@ public class UserService {
      * @return 삭제 결과
      */
     public int deleteUser(int id){
+        validateUser(id);
         return userMapper.delete(id);
     }
 
@@ -217,5 +182,48 @@ public class UserService {
         return true;
     }
 
+    /**
+     * DB에 저장된 유저 정보가 존재하는지 확인하고, 유저 정보를 반환
+     * @param userId
+     * @return user
+     * @throws NotFoundException // 유저 정보가 존재하지 않음.
+     */
+
+    public UserDTO validateUser(int id) throws NotFoundException {
+        UserDTO user = userMapper.getUserByIdOrUserId(id);
+        if (user == null) {
+            throw new NotFoundException("사용자를 찾을 수 없습니다.");
+        }
+        return user;
+    }
+
+    public UserDTO validateUser(String userId) throws NotFoundException {
+        UserDTO userparam = new UserDTO();
+        userparam.setUserId(userId);
+
+        UserDTO user = userMapper.getUserByIdOrUserId(userparam);
+        if (user == null) {
+            throw new NotFoundException("사용자를 찾을 수 없습니다.");
+        }
+        return user;
+    }
+
+    /**
+     * user 정보 조회
+     * @param id
+     * @return 조회된 사용자 정보
+     */
+    public UserDTO getUser(int id){
+        return validateUser(id);
+    }
+
+    /**
+     * user 정보 조회
+     * @param userId
+     * @return
+     */
+    public UserDTO getUser(String userId){
+        return validateUser(userId);
+    }
 
 }

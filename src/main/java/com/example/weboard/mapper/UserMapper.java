@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserMapper extends BaseMapper{
-    UserDTO getUserById(int id);
+    UserDTO getUserByIdOrUserId(int id);
     UserDTO getUserByIdOrUserId(UserDTO user);
     int getIdByUserId(String userId);
     String getPasswordById(int id);
