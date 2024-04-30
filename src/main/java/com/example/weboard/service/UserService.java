@@ -34,10 +34,10 @@ public class UserService {
 //                .id(id)
 //                .build();
 
-        UserDTO user = new UserDTO();
-        user.setId(id);
+//        UserDTO user = new UserDTO();
+//        user.setId(id);
 
-        return userMapper.getUserByIdOrUserId(user);
+        return userMapper.getUserById(id);
     }
 
     /**

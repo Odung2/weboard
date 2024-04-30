@@ -85,8 +85,8 @@ public class AuthService {
      * @throws NoSuchAlgorithmException // 비밀번호 암호화 알고리즘 존재 확인
      */
     public void validatePassword(UserDTO user, String loginPassword) throws CredentialException, NoSuchAlgorithmException {
-        String hashedPassword = userService.plainToSha256(user.getPassword());
-        if (!loginPassword.equals(hashedPassword)) {
+        String hashedPassword = userService.plainToSha256(loginPassword);
+        if (!user.getPassword().equals(hashedPassword)) {
             int failCount = userService.addLoginFailCount(user); // 로그인 실패 횟수 +1
             if(failCount>=5){ // 로그인 실패횟수가 5회 이상
                 userService.updateLoginLock(user); // loginLock 시간 update

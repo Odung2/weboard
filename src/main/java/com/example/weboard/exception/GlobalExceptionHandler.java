@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.security.auth.login.CredentialException;
 import java.security.SignatureException;
 
 @RestControllerAdvice
@@ -95,6 +96,11 @@ public class GlobalExceptionHandler extends BaseController {
     }
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<ApiResponse<Object>> handleUnauthorizedAccessException(UnauthorizedAccessException e){
+        return nok(403, e.getMessage());
+    }
+
+    @ExceptionHandler(CredentialException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCredentialException(CredentialException e){
         return nok(403, e.getMessage());
     }
 
