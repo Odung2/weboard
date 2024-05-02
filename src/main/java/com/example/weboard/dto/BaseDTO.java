@@ -19,12 +19,12 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseDTO {
 
-    @Schema(description = "작성자 ID", required = true)
+    @Schema(description = "작성자 ID")
     private int createdBy;
 
     @CreatedDate
     @Column(updatable = false)
-    @Schema(description = "작성일", readOnly = true)
+    @Schema(description = "작성일")
     private LocalDateTime createdAt;
 
 

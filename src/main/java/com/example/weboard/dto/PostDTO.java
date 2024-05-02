@@ -19,13 +19,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "게시물 정보를 담는 DTO")
 public class PostDTO extends BaseDTO{
 
-    @Schema(description = "게시물 ID", required = true)
+    @Schema(description = "게시물 ID")
     private int postId;
 
-    @Schema(description = "제목", required = true)
+    @Schema(description = "제목")
     private String title;
 
-    @Schema(description = "조회수", required = true)
+    @Schema(description = "조회수")
     private int views;
 
     @Schema(description = "내용")

@@ -28,10 +28,10 @@ import java.util.Date;
 @Schema(description = "사용자 정보를 나타내는 DTO")
 public class UserDTO extends BaseDTO{
 
-    @Schema(description = "사용자 ID", required = true)
+    @Schema(description = "사용자 ID")
     private int id;
 
-    @Schema(description = "사용자 아이디", required = true)
+    @Schema(description = "사용자 아이디")
     private String userId;
 
     @Schema(description = "사용자 닉네임")
@@ -43,21 +43,21 @@ public class UserDTO extends BaseDTO{
 
     @Schema(description = "마지막 로그인 일자")
     @LastModifiedDate
-    private Date lastLogin;
+    private LocalDateTime lastLoginAt;
 
     @Schema(description = "로그인 실패 횟수")
-    private int loginFail;
+    private int loginFailCount;
 
     @Schema(description = "계정 잠금 여부")
     private int isLocked;
 
     @Schema(description = "마지막 비밀번호 변경 일자")
     @LastModifiedDate
-    private Date lastPwUpdated;
+    private LocalDateTime pwUpdatedAt;
 
     @Schema(description = "로그인 잠금 일자")
     @LastModifiedDate
-    private Date loginLocked;
+    private LocalDateTime loginLockedAt;
 
 //    @Builder(builderMethodName = "setOnlyId")
 //    public UserDTO(int id){

@@ -21,9 +21,9 @@ public class TokensDTO {
     @NotNull
     @NotBlank
     @Id
-    @Schema(description = "액세스 토큰", required = true)
+    @Schema(description = "액세스 토큰")
     private String accessToken;
 
-    @Schema(description = "리프레시 토큰", required = true)
+    @Schema(description = "리프레시 토큰")
     private String refreshToken;
 }
