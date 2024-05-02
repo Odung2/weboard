@@ -1,6 +1,7 @@
 package com.example.weboard.param;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -12,13 +13,14 @@ import lombok.RequiredArgsConstructor;
 public class UpdatePostParam {
 
     @NotBlank(message = "제목을 작성해주세요.")
-    @Schema(description = "제목", required = true)
+    @Schema(description = "제목")
     private String title;
 
     @NotBlank(message = "내용을 작성해주세요.")
     @Schema(description = "내용")
     private String contents;
 
+    @Nullable
     @Schema(description = "파일 데이터")
     private byte[] fileData;
 }

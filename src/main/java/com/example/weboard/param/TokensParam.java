@@ -10,13 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TokensParam {
 
-    @NotBlank
-    @NotNull
-    @Schema(description = "Access token", required = true)
+    @NotBlank(message = "액세스 토큰을 넣어주세요.")
+    @Schema(description = "Access token")
     private String accessToken;
 
-    @NotBlank
-    @NotNull
-    @Schema(description = "refresh token", required = true)
+    @NotBlank(message = "리프레시 토큰을 넣어주세요.")
+    @Schema(description = "refresh token")
     private String refreshToken;
 }

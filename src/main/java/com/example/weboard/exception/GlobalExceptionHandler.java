@@ -2,20 +2,39 @@ package com.example.weboard.exception;
 
 import com.example.weboard.controller.BaseController;
 import com.example.weboard.dto.ApiResponse;
+import com.example.weboard.dto.FrkConstants;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.coyote.BadRequestException;
+import org.springdoc.api.ErrorMessage;
 import org.springframework.aop.framework.AopConfigException;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.security.auth.login.CredentialException;
 import java.security.SignatureException;
+import java.util.logging.Logger;
+import java.util.logging.LoggingPermission;
 
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler extends BaseController {
+
+    private final MessageSource messageSource;
 
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<ApiResponse<Object>> handleJwtSignatureException(SignatureException e){
@@ -81,7 +100,13 @@ public class GlobalExceptionHandler extends BaseController {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Object>> handleRuntimeException(RuntimeException e){
-        return nok(500, e.getMessage(), e.getClass());
+//        return nok(500, "실행 과정 중 오류가 발생했습니다.",e.getClass());
+        return nok(500, e.getMessage(),e.getClass());
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDuplicateKeyException(DuplicateKeyException e){
+        return nok(409, e.getMessage());
     }
 
     @ExceptionHandler(GenerateNewAccessJWTException.class)
@@ -104,5 +129,42 @@ public class GlobalExceptionHandler extends BaseController {
         return nok(403, e.getMessage());
     }
 
+    /**
+     * javax valid에 의한 유효성 검증 에러
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity<ApiResponse<Object>> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+//
+        ObjectError objErr = e.getBindingResult().getAllErrors().get(0);
+        String detailMsg = createDetailMessage(objErr);
+//        String errorMessage = getMessage(FrkConstants.CD_PARAM_ERR + "") + detailMsg;
+//        String errorMessage = getMessage(FrkConstants.CD_PARAM_ERR+" ");
+        Object body = new ErrorMessage(detailMsg);
 
+//        return handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.OK, request);
+        return nok(FrkConstants.CD_PARAM_ERR, body);
+    }
+
+    /**
+     * javax valid에서 발생한 에러의 메세지 생성
+     * @param objErr
+     * @return
+     */
+    private String createDetailMessage(ObjectError objErr) {
+        if (objErr instanceof FieldError) {
+            FieldError fieldErr = (FieldError) objErr;
+            return String.format("[Field : %s, Message : %s]", fieldErr.getField(), fieldErr.getDefaultMessage());
+        } else {
+            return String.format("[Object Name : %s, Message : %s]", objErr.getObjectName(),
+                    objErr.getDefaultMessage());
+        }
+    }
+
+    private String getMessage(String code) {
+        return getMessage(code, null);
+    }
+
+    private String getMessage(String code, Object[] args) {
+        return messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
+    }
 }

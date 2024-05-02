@@ -11,18 +11,11 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 public class InsertPostParam {
 
-//    @NotBlank
-//    @NotNull
-//    @Schema(description = "게시물 ID", required = true)
-//    private int postId;
-
     @NotBlank(message = "제목을 작성해주세요.")
-    @NotNull(message = "제목을 작성해주세요.")
-    @Schema(description = "제목", required = true)
+    @Schema(description = "제목")
     private String title;
 
     @NotBlank(message = "내용을 작성해주세요.")
-    @NotNull(message = "내용을 작성해주세요.")
     @Schema(description = "내용")
     private String contents;
 

@@ -11,15 +11,6 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 public class InsertCommentParam {
 
-//    @NotNull
-//    @NotBlank
-//    private int postId;
-//
-//    @NotNull
-//    @NotBlank
-//    private int userId;
-
-    @NotNull(message = "댓글 내용을 작성해주세요.")
     @NotBlank(message = "댓글 내용을 작성해주세요.")
     private String commentText;
 }

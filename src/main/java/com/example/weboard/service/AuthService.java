@@ -17,6 +17,8 @@ import javax.security.auth.login.CredentialException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static com.example.weboard.dto.FrkConstants.lockUser;
@@ -107,8 +109,8 @@ public class AuthService {
      */
     public void validateLastPwUpdate(UserDTO user, TokensDTO issueTokens) throws LastPwException {
         //마지막 비번 변경 확인
-        Date currentDate = new Date();
-        long lastPwUpdatedFromToday = (currentDate.getTime() - user.getLastPwUpdated().getTime()) / (1000 * 60 * 60 * 24);
+
+        long lastPwUpdatedFromToday = Duration.between(LocalDateTime.now(), user.getPwUpdatedAt()).toDays();
         // 3개월 이상 비번 변경 x
         if(lastPwUpdatedFromToday > 3*month ) throw new LastPwException(String.valueOf(issueTokens));
     }
@@ -130,9 +132,9 @@ public class AuthService {
     public void validateLoginAttempts(UserDTO user) throws LoginLockException {
         Date currentDate = new Date();
         //login 제한이 걸려있는지, 5번 이상 로그인 실패 했는지 확인
-        if(user.getLoginLocked() != null && user.getLoginFail() >= 5){
+        if(user.getLoginLockedAt() != null && user.getLoginFailCount() >= 5){
             // login 제한이 걸린 시각으로부터 현재 시각까지의 차이를 구함
-            long lastLoginLockFromNow = (currentDate.getTime() - user.getLoginLocked().getTime()) / (1000 * 60);
+            long lastLoginLockFromNow =  Duration.between(LocalDateTime.now(), user.getLoginLockedAt()).toMinutes();
             // 로그인 제한은 5분이므로 5분보다 짧으면 Login을 할 수 없게 LoginLockException을 던짐
             if(lastLoginLockFromNow<5) throw new LoginLockException();
             //만약 5분이 지났다면 로그인 시도 제한은 풀림
@@ -147,7 +149,7 @@ public class AuthService {
     public void validateLastLogin(UserDTO user) throws LastLoginException {
         Date currentDate = new Date();
         // 마지막 로그인으로부터 현재 로그인한 날짜 차이를 계산
-        long lastLoginFromToday = (currentDate.getTime() - user.getLastLogin().getTime()) / (1000 * 60 * 60 * 24);
+        long lastLoginFromToday =  Duration.between(LocalDateTime.now(), user.getLastLoginAt()).toDays();
         if(lastLoginFromToday > month) {  // 1개월 이상 접속(로그인) 하지 않은 경우, 계정을 잠그고, 로그인을 못 하게 함.
             userService.lockUnlockUser(user.getId(), lockUser);
             throw new LastLoginException();

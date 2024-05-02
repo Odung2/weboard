@@ -59,28 +59,5 @@ public class UserDTO extends BaseDTO{
     @LastModifiedDate
     private LocalDateTime loginLockedAt;
 
-//    @Builder(builderMethodName = "setOnlyId")
-//    public UserDTO(int id){
-//        this.id=id;
-//    }
-
-//    @Builder(builderMethodName = "setOnlyUserId")
-//    public UserDTO(String userId){
-//        this.userId=userId;
-//    }
-//
-//    @Builder(builderMethodName = "setSignupForm")
-//    public UserDTO(String nickname, String password){
-//        this.nickname=nickname;
-//        this.password=password;
-//    }
-//    @Builder(builderMethodName = "updateUser")
-//
-//    public  UserDTO(int id, String nickname, String password, LocalDateTime now){
-//        this.id = id;
-//        this.nickname = nickname;
-//        this.password = password;
-//        this.d = now;
-//    }
 
 }

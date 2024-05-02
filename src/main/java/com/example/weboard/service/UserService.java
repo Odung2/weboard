@@ -9,6 +9,7 @@ import com.example.weboard.param.SignupParam;
 import com.example.weboard.param.UpdateUserParam;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
@@ -42,7 +43,7 @@ public class UserService {
     public int addLoginFailCount(UserDTO param){
         userMapper.addLoginFailCount(param.getId());
         UserDTO user = userMapper.getUserByIdOrUserId(param);
-        return user.getLoginFail();
+        return user.getLoginFailCount();
     }
 
     /**
@@ -55,7 +56,7 @@ public class UserService {
         userMapper.resetLoginFailCount(id);
         userMapper.resetLoginLocked(id);
         UserDTO user = userMapper.getUserByIdOrUserId(param);
-        return user.getLoginFail();
+        return user.getLoginFailCount();
     }
 
     /**
@@ -74,7 +75,7 @@ public class UserService {
      * @return 업데이트 결과
      */
     public int updateLoginLock(UserDTO user){
-        user.setLoginLocked(new Date());
+        user.setLoginLockedAt(LocalDateTime.now());
         return userMapper.updateLoginLocked(user);
     }
 
@@ -88,6 +89,8 @@ public class UserService {
         String plainPassword = signupParam.getPassword();
         checkNewPwValid(plainPassword);
         String sha256Password = plainToSha256(plainPassword);
+
+        if(getUser(signupParam.getUserId())!=null) throw new DuplicateKeyException("중복된 아이디입니다. 다른 아이디를 입력해주세요.");
 
         UserDTO user = new UserDTO();
         user.setUserId(signupParam.getUserId());

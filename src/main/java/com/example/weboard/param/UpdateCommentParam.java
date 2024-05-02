@@ -11,18 +11,15 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 public class UpdateCommentParam {
 
-    @NotNull
-    @NotBlank
-    @Schema(description = "게시물 ID", required = true)
+    @NotBlank(message = "게시물 ID를 작성해주세요.")
+    @Schema(description = "게시물 ID")
     private int postId;
 
-    @NotNull
-    @NotBlank
-    @Schema(description = "사용자 ID", required = true)
+    @NotBlank(message = "사용자 ID를 작성해주세요.")
+    @Schema(description = "사용자 ID")
     private int userId;
 
-    @NotNull(message = "댓글 내용을 작성해주세요.")
     @NotBlank(message = "댓글 내용을 작성해주세요.")
-    @Schema(description = "댓글 내용", required = true)
+    @Schema(description = "댓글 내용")
     private String commentText;
 }

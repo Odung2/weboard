@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "토큰 정보를 나타내는 DTO")
 public class TokensDTO {
 
-    @NotNull
     @NotBlank
     @Id
     @Schema(description = "액세스 토큰")
