@@ -5,9 +5,11 @@ import com.example.weboard.mapper.CommentMapper;
 import com.example.weboard.dto.CommentDTO;
 import com.example.weboard.param.InsertCommentParam;
 import com.example.weboard.param.UpdateCommentParam;
+import com.example.weboard.response.CommentRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,6 +29,10 @@ public class CommentService {
 
     public CommentDTO getCommentByCommentId(int commentId){
         return commentMapper.getCommentByCommentId(commentId);
+    }
+
+    public List<CommentRes> getCommentRes(int postId) {
+        return commentMapper.getComments(postId);
     }
 
     /**
@@ -63,8 +69,9 @@ public class CommentService {
 
         CommentDTO comment = new CommentDTO();
         comment.setCommentText(updateCommentParam.getCommentText());
-        comment.setUserId(updateCommentParam.getUserId());
-        comment.setPostId(updateCommentParam.getPostId());
+//        comment.setUserId(updateCommentParam.getUserId());
+//        comment.setPostId(updateCommentParam.getPostId());
+        comment.setUserId(id);
         comment.setCommentId(commentId);
 
         commentMapper.update(comment);

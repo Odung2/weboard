@@ -7,6 +7,8 @@ import com.example.weboard.mapper.UserMapper;
 import com.example.weboard.dto.UserDTO;
 import com.example.weboard.param.SignupParam;
 import com.example.weboard.param.UpdateUserParam;
+import com.example.weboard.response.MyInfoRes;
+import com.example.weboard.response.PublicUserInfoRes;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
@@ -31,7 +33,7 @@ public class UserService {
      * @return 해당 사용자의 비밀번호
      */
     public String getPasswordById(int id) {
-        validateUser(id);
+        getUser(id);
         return userMapper.getPasswordById(id);
     }
 
@@ -108,7 +110,7 @@ public class UserService {
      * @return 업데이트된 사용자 정보
      */
     public UserDTO updateUser(UpdateUserParam updateUserParam, int id) throws Exception {
-        validateUser(id);
+        getUser(id);
 
         String plainPassword = updateUserParam.getPassword();
         String sha256Password = "";
@@ -135,7 +137,7 @@ public class UserService {
      * @return 삭제 결과
      */
     public int deleteUser(int id){
-        validateUser(id);
+        getUser(id);
         return userMapper.delete(id);
     }
 
@@ -185,14 +187,22 @@ public class UserService {
         return true;
     }
 
+    public PublicUserInfoRes getPublicUser(int id){
+        return new PublicUserInfoRes(getUser(id));
+    }
+
+    public MyInfoRes getPrivateUser(int id){
+        return new MyInfoRes(getUser(id));
+    }
+
     /**
      * DB에 저장된 유저 정보가 존재하는지 확인하고, 유저 정보를 반환
-     * @param userId
+     * @param id 또는 userId
      * @return user
      * @throws NotFoundException // 유저 정보가 존재하지 않음.
      */
 
-    public UserDTO validateUser(int id) throws NotFoundException {
+    public UserDTO getUser(int id) {
         UserDTO user = userMapper.getUserByIdOrUserId(id);
         if (user == null) {
             throw new NotFoundException("사용자를 찾을 수 없습니다.");
@@ -200,7 +210,7 @@ public class UserService {
         return user;
     }
 
-    public UserDTO validateUser(String userId) throws NotFoundException {
+    public UserDTO getUser(String userId) {
         UserDTO userparam = new UserDTO();
         userparam.setUserId(userId);
 
@@ -211,22 +221,22 @@ public class UserService {
         return user;
     }
 
-    /**
-     * user 정보 조회
-     * @param id
-     * @return 조회된 사용자 정보
-     */
-    public UserDTO getUser(int id){
-        return validateUser(id);
-    }
-
-    /**
-     * user 정보 조회
-     * @param userId
-     * @return
-     */
-    public UserDTO getUser(String userId){
-        return validateUser(userId);
-    }
+//    /**
+//     * user 정보 조회
+//     * @param id
+//     * @return 조회된 사용자 정보
+//     */
+//    public UserDTO getUser(int id){
+//        return validateUser(id);
+//    }
+//
+//    /**
+//     * user 정보 조회
+//     * @param userId
+//     * @return
+//     */
+//    public UserDTO getUser(String userId){
+//        return validateUser(userId);
+//    }
 
 }

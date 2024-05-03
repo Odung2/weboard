@@ -2,6 +2,7 @@ package com.example.weboard.mapper;
 
 import com.example.weboard.dto.PostDTO;
 import com.example.weboard.param.BasePagingParam;
+import com.example.weboard.response.DetailPostRes;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,4 +21,6 @@ public interface PostMapper extends BaseMapper {
     int update(PostDTO post);
     @Override
     int delete(int postId);
+
+    DetailPostRes getDetailPostRes(int postId);
 }

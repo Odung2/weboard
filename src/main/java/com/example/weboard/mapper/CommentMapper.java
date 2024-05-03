@@ -1,6 +1,7 @@
 package com.example.weboard.mapper;
 
 import com.example.weboard.dto.CommentDTO;
+import com.example.weboard.response.CommentRes;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface CommentMapper extends BaseMapper{
     int update(CommentDTO comment);
     @Override
     int delete(int commentId);
+
+    List<CommentRes> getComments(int postId);
 }

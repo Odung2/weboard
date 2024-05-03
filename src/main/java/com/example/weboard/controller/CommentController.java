@@ -5,6 +5,7 @@ import com.example.weboard.dto.CommentDTO;
 import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.param.InsertCommentParam;
 import com.example.weboard.param.UpdateCommentParam;
+import com.example.weboard.response.CommentRes;
 import com.example.weboard.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,9 @@ public class CommentController extends BaseController{
      */
     @Operation(summary = "특정 게시물의 댓글을 조회합니다.")
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<List<CommentDTO>>> getCommentByPostId(
+    public ResponseEntity<ApiResponse<List<CommentRes>>> getCommentByPostId(
             @PathVariable int postId){
-        return ok(commentService.getCommentByPostId(postId));
+        return ok(commentService.getCommentRes(postId));
     }
 
     /**

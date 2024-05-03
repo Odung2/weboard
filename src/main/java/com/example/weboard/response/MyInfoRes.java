@@ -2,9 +2,10 @@ package com.example.weboard.response;
 
 import com.example.weboard.dto.UserDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-
+@Data
 public class MyInfoRes {
     @Schema(description = "사용자 아이디")
     private String userId;

@@ -48,7 +48,7 @@ public class AuthService {
     public TokensDTO loginAndIssueTokens(LoginParam loginParam) throws Exception { //순서에 영향을 받음 PARAM을 .. 재사용성이 있으면 parameter을 써라
 
         // DB에 저장된 유저 정보 존재 확인
-        UserDTO user = userService.validateUser(loginParam.getUserId());
+        UserDTO user = userService.getUser(loginParam.getUserId());
         // 로그인 시도 제한 확인
         validateLoginAttempts(user);
         // 비밀번호 확인 - 실제 로그인
@@ -256,7 +256,7 @@ public class AuthService {
         try {
             extractJWTClaims(accessJWT);
         } catch (ExpiredJwtException e) {
-            return reissueAccessToken(e, refreshJWT);
+            return reissueAccessToken(e, refreshJWT, accessJWT);
         }
         throw new TokenNotIssueException("액세스 토큰이 만료되지 않아 새 액세스 토큰을 발급할 수 없습니다.");
     }
@@ -267,12 +267,12 @@ public class AuthService {
      * @param refreshJWT
      * @return
      */
-    public String reissueAccessToken(ExpiredJwtException e, String refreshJWT) {
+    public String reissueAccessToken(ExpiredJwtException e, String refreshJWT, String accessToken) {
         // access token은 만료되어야 새로 access token을 발급 해줌.(무한 발급 방지)
         int id = Integer.parseInt(e.getClaims().getSubject());
         String userId = e.getClaims().get("userId", String.class);
         //FIXME: getId가 accesstoken이랑 동일한지 확인 필요
-        redisService.deleteValues(e.getClaims().getId()); // 기존 accessJWT(key), refresh(value) pair는 redis에서 삭제
+        redisService.deleteValues(accessToken); // 기존 accessJWT(key), refresh(value) pair는 redis에서 삭제
 
         String newAccessJWT = generateAccessJWT(id, userId); // 새로운 Access JWT 발급
         redisService.setValues(newAccessJWT, refreshJWT); // redis에 새 조합 등록

@@ -1,25 +1,22 @@
 package com.example.weboard.controller;
 
 import com.example.weboard.dto.ApiResponse;
-import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.dto.TokensDTO;
 import com.example.weboard.dto.UserDTO;
-import com.example.weboard.exception.PasswordRegexException;
 import com.example.weboard.param.LoginParam;
 import com.example.weboard.param.SignupParam;
-import com.example.weboard.param.TokensParam;
 import com.example.weboard.param.UpdateUserParam;
+import com.example.weboard.response.MyInfoRes;
+import com.example.weboard.response.PublicUserInfoRes;
 import com.example.weboard.service.AuthService;
 import com.example.weboard.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
-
-import java.security.NoSuchAlgorithmException;
 
 @RequestMapping("/weboard/users")
 @RestController
@@ -31,14 +28,15 @@ public class UserController extends BaseController{
 
     /**
      * 사용자 공공(public) 정보 조회, credential 필요 없음
+     *
      * @param id
      * @return
      */
-    @Operation(summary = "사용자의 공공(public)정보를 조회", description = "특정 사용자의 공공정보를 ID로 조회합니다.")
+    @Operation(summary = "공공(public)정보를 조회", description = "특정 사용자의 공공정보를 ID로 조회합니다.")
     @GetMapping("/public/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> getUserById(
-            @PathVariable int id) {
-        return ok(userService.getUser(id));
+    public ResponseEntity<ApiResponse<PublicUserInfoRes>> getUserById(
+            @PathVariable @Min(value = 1, message = "1 이상부터 입력가능합니다.") int id) {
+        return ok(userService.getPublicUser(id));
     }
 
     /**
@@ -47,7 +45,7 @@ public class UserController extends BaseController{
      * @return [액세스 토큰, 리프레시 토큰]
      * @throws Exception
      */
-    @Operation(summary = "사용자 로그인", description = "사용자 로그인을 처리합니다.")
+    @Operation(summary = "로그인", description = "로그인을 처리합니다.")
     @PostMapping("/public/login")
     public ResponseEntity<ApiResponse<TokensDTO>> login(
             @RequestBody @Valid LoginParam loginParam) throws Exception{
@@ -75,7 +73,7 @@ public class UserController extends BaseController{
      * @param signupParam 등록할 사용자의 데이터를 담은 DTO(userId, nickname, password)
      * @return user 등록된 유저 정보
      */
-    @Operation(summary = "새로운 사용자 등록", description = "새로운 사용자를 등록합니다.")
+    @Operation(summary = "회원가입(새로운 사용자 등록)", description = "새로운 사용자를 등록합니다.")
     @PostMapping("/public/signup")
     public ResponseEntity<ApiResponse<UserDTO>> insertUser(
             @RequestBody @Valid SignupParam signupParam) throws Exception {
@@ -84,14 +82,15 @@ public class UserController extends BaseController{
 
     /**
      * 개인정보 조회, 액세스 토큰을 통해 인증된 사용자의 개인정보 조회 요청 처리
+     *
      * @param id 액세스 토큰
      * @return user
      */
     @Operation(summary = "개인정보 조회", description = "사용자의 개인정보를 액세스 토큰을 통해 조회합니다.")
     @GetMapping("/my-info")
-    public ResponseEntity<ApiResponse<UserDTO>> getMyInfo(
-            @RequestAttribute("reqId") int id) {
-        return ok(userService.getUser(id));
+    public ResponseEntity<ApiResponse<MyInfoRes>> getMyInfo(
+            @RequestAttribute("reqId") @Min(value = 1, message = "1 이상부터 입력가능합니다.") int id) {
+        return ok(userService.getPrivateUser(id));
     }
 
     /**
@@ -101,7 +100,7 @@ public class UserController extends BaseController{
      * @return
      * @throws Exception Password 양식 Exception, 암호화 알고리즘 Exception
      */
-    @Operation(summary = "개인정보 수정", description = "개인정보(nickname || password)를 수정할 수 있습니다.")
+    @Operation(summary = "개인정보 수정", description = "개인정보(nickname 또는 password)를 수정할 수 있습니다.")
     @PutMapping("/my-info")
     public ResponseEntity<ApiResponse<UserDTO>> updateUser(
             @RequestAttribute("reqId") int id,
@@ -114,7 +113,7 @@ public class UserController extends BaseController{
      * @param id 본인의 id
      * @return
      */
-    @Operation(summary = "특정 사용자 삭제", description = "특정 사용자를 삭제합니다.")
+    @Operation(summary = "회원탈퇴(개인정보 삭제)", description = "권한이 있는 유저의 개인정보를 삭제할 수 있습니다.")
     @DeleteMapping("/my-info")
     public ResponseEntity<ApiResponse<Integer>> deleteUser(
             @RequestAttribute("reqId") int id){

@@ -2,9 +2,10 @@ package com.example.weboard.response;
 
 import com.example.weboard.dto.CommentDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-
+@Data
 public class CommentRes {
     @Schema(description = "게시물 ID")
     public int postId;
@@ -16,13 +17,21 @@ public class CommentRes {
     public LocalDateTime createdAt;
     @Schema(description = "최종 변경 일시")
     public LocalDateTime updatedAt;
-
-    public CommentRes(CommentDTO comment, String nickname) {
-        this.nickname = nickname;
-
-        this.postId = comment.getPostId();
-        this.commentText = comment.getCommentText();
-        this.createdAt = comment.getCreatedAt();
-        this.updatedAt = comment.getUpdatedAt();
-    }
+//
+//    public CommentRes(CommentDTO comment, String nickname) {
+//        this.nickname = nickname;
+//
+//        this.postId = comment.getPostId();
+//        this.commentText = comment.getCommentText();
+//        this.createdAt = comment.getCreatedAt();
+//        this.updatedAt = comment.getUpdatedAt();
+//    }
+//    public CommentRes(CommentDTO comment, String nickname) {
+//        this.nickname = nickname;
+//
+//        this.postId = comment.getPostId();
+//        this.commentText = comment.getCommentText();
+//        this.createdAt = comment.getCreatedAt();
+//        this.updatedAt = comment.getUpdatedAt();
+//    }
 }

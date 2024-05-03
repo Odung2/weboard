@@ -11,6 +11,11 @@
         SELECT * FROM post
     </select>
 
+    <select id="getDetailPostRes" parameterType="int" resultType="DetailPostRes">
+        SELECT post.post_id, post.title, user.nickname, post.views, post.contents, post.file_path
+        FROM post LEFT JOIN user ON post.created_by = user.id WHERE post_id = #{postId}
+    </select>
+
     <select id="getPostAllByOffset" parameterType="int" resultType="PostDTO">
         SELECT * FROM post LIMIT #{pagesize}
                  <if test="offset!=null">

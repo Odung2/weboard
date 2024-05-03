@@ -9,6 +9,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.coyote.BadRequestException;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springdoc.api.ErrorMessage;
 import org.springframework.aop.framework.AopConfigException;
 import org.springframework.context.MessageSource;
@@ -127,6 +128,11 @@ public class GlobalExceptionHandler extends BaseController {
     @ExceptionHandler(CredentialException.class)
     public ResponseEntity<ApiResponse<Object>> handleCredentialException(CredentialException e){
         return nok(403, e.getMessage());
+    }
+
+    @ExceptionHandler(org.webjars.NotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNotFoundException(org.webjars.NotFoundException e){
+        return nok(404, "해당 정보가 존재하지 않습니다.", e.getMessage());
     }
 
     /**

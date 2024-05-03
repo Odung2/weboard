@@ -1,7 +1,7 @@
 package com.example.weboard.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.example.weboard.response.CommentRes;
+import com.example.weboard.response.DetailPostRes;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,9 +14,9 @@ import java.util.List;
 public class PostViewBO {
 
     @Schema(description = "게시물 정보")
-    private PostDTO post;
+    private DetailPostRes post;
 
     @Schema(description = "댓글 목록")
-    private List<CommentDTO> comment;
+    private List<CommentRes> comment;
 
 }

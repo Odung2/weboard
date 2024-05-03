@@ -3,10 +3,11 @@ package com.example.weboard.response;
 import com.example.weboard.dto.PostDTO;
 import com.example.weboard.service.UserService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
-
+@Data
 public class PublicPostRes {
     @Schema(description = "포스트 아이디")
     private int postId;

@@ -7,6 +7,7 @@ import com.example.weboard.dto.PostDTO;
 import com.example.weboard.param.BasePagingParam;
 import com.example.weboard.param.InsertPostParam;
 import com.example.weboard.param.UpdatePostParam;
+import com.example.weboard.response.DetailPostRes;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
@@ -40,8 +41,8 @@ public class PostService {
     public PostViewBO getPostViewById(int postId){
 
         PostViewBO postView = new PostViewBO();
-        postView.setPost(postMapper.getPostById(postId));
-        postView.setComment(commentService.getCommentByPostId(postId));
+        postView.setPost(postMapper.getDetailPostRes(postId));
+        postView.setComment(commentService.getCommentRes(postId));
 
         return postView;
     }
@@ -50,6 +51,9 @@ public class PostService {
         return postMapper.getPostById(postId);
     }
 
+    public DetailPostRes getPostRes(int postId){
+        return postMapper.getDetailPostRes(postId);
+    }
 
     /**
      * 새로운 게시물을 추가합니다.
