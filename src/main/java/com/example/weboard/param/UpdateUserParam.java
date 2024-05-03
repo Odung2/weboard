@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 public class UpdateUserParam {
     @Nullable
+    @Size(min = 1, max=20, message = "닉네임은 1자 이상 20자 이하만 가능합니다.")
     @Schema(description = "사용자 닉네임")
     private String nickname;
 
