@@ -73,6 +73,8 @@ public class CommentService {
 //        comment.setPostId(updateCommentParam.getPostId());
         comment.setUserId(id);
         comment.setCommentId(commentId);
+        //FIXME auditListener로 고쳐야 함
+        comment.setUpdatedBy(id);
 
         commentMapper.update(comment);
         return comment;

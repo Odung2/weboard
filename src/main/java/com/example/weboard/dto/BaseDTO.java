@@ -3,6 +3,7 @@ package com.example.weboard.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 //@SuperBuilder
+@MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class BaseDTO {
 

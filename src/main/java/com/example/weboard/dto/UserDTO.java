@@ -1,8 +1,10 @@
 package com.example.weboard.dto;
 
+import com.example.weboard.audit.UpdateEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,10 +26,13 @@ import java.util.Date;
 //@SuperBuilder
 //@AllArgsConstructor
 //@SuperBuilder(builderMethodName = "updateUser")
-@EntityListeners(AuditingEntityListener.class)
+@Entity
+//@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(UpdateEntityListener.class)
 @Schema(description = "사용자 정보를 나타내는 DTO")
 public class UserDTO extends BaseDTO{
 
+    @Id
     @Schema(description = "사용자 ID")
     private int id;
 
@@ -58,6 +63,5 @@ public class UserDTO extends BaseDTO{
     @Schema(description = "로그인 잠금 일자")
     @LastModifiedDate
     private LocalDateTime loginLockedAt;
-
 
 }

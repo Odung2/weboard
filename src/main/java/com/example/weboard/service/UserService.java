@@ -126,6 +126,8 @@ public class UserService {
         user.setNickname(updateUserParam.getNickname());
         user.setPassword(sha256Password);
         user.setUpdatedAt(LocalDateTime.now()); // 상속받은 필드는 builder 패턴 사용이 어려움...
+        //FIXME auditListener로 고쳐야 함
+        user.setUpdatedBy(id);
 
         userMapper.update(user);
         return user;

@@ -93,6 +93,7 @@ public class PostService {
         post.setContents(updatePostParam.getContents());
         post.setFileData(updatePostParam.getFileData());
         post.setPostId(postId);
+        //FIXME auditListener로 고쳐야 함
         post.setUpdatedBy(id);
 
         postMapper.update(post);

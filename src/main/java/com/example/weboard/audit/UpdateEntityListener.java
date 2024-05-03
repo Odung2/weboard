@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.context.request.WebRequest;
 
 public class UpdateEntityListener {
-
-    @PrePersist
-    @PreUpdate
-    public void beforeUpdate(UserDTO param, WebRequest request){
-        int id = (int) request.getAttribute("reqId", WebRequest.SCOPE_REQUEST);
-        param.setUpdatedBy(id);
-    }
+//
+//    @PrePersist
+//    @PreUpdate
+//    public void beforeUpdate(UserDTO param){
+////        WebRequest request = WebRequest
+//        int id = (int) request.getAttribute("reqId", WebRequest.SCOPE_REQUEST);
+//        param.setUpdatedBy(id);
+//    }
 //
 //    @PrePersist
 //    @PreUpdate
