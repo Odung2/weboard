@@ -2,7 +2,6 @@ package com.example.weboard.service;
 
 import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.exception.PasswordRegexException;
-import com.example.weboard.exception.ShortPasswordException;
 import com.example.weboard.mapper.UserMapper;
 import com.example.weboard.dto.UserDTO;
 import com.example.weboard.param.SignupParam;
@@ -10,7 +9,6 @@ import com.example.weboard.param.UpdateUserParam;
 import com.example.weboard.response.MyInfoRes;
 import com.example.weboard.response.PublicUserInfoRes;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -19,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.regex.Pattern;
 
 @Service
@@ -83,11 +80,12 @@ public class UserService {
 
     /**
      * 새로운 사용자를 데이터베이스에 삽입합니다.
+     *
      * @param signupParam 사용자 정보
      * @return 삽입된 사용자 정보
      * @throws Exception 비밀번호 검증 실패 시 예외 발생
      */
-    public UserDTO insertUser(SignupParam signupParam) throws Exception {
+    public String insertUser(SignupParam signupParam) throws Exception {
         String plainPassword = signupParam.getPassword();
         checkNewPwValid(plainPassword);
         String sha256Password = plainToSha256(plainPassword);
@@ -100,16 +98,17 @@ public class UserService {
         user.setPassword(sha256Password);
 
         userMapper.insert(user);
-        return user;
+        return user.getNickname();
     }
 
     /**
      * 주어진 ID의 사용자 정보를 업데이트합니다.
+     *
      * @param updateUserParam 사용자 정보
-     * @param id 사용자 ID
+     * @param id              사용자 ID
      * @return 업데이트된 사용자 정보
      */
-    public UserDTO updateUser(UpdateUserParam updateUserParam, int id) throws Exception {
+    public String updateUser(UpdateUserParam updateUserParam, int id) throws Exception {
         getUser(id);
 
         String plainPassword = updateUserParam.getPassword();
@@ -130,7 +129,7 @@ public class UserService {
         user.setUpdatedBy(id);
 
         userMapper.update(user);
-        return user;
+        return user.getNickname();
     }
 
     /**
@@ -139,6 +138,7 @@ public class UserService {
      * @return 삭제 결과
      */
     public int deleteUser(int id){
+        // 삭제하려는 유저가 존재하는지 확인
         getUser(id);
         return userMapper.delete(id);
     }
@@ -174,19 +174,11 @@ public class UserService {
      * @throws Exception 비밀번호 길이 또는 형식 불일치로 인한 예외 발생
      */
     public boolean checkNewPwValid(String password) throws Exception{
-        if(password.length() < 8){
-            throw new ShortPasswordException();
-        }
-        if(password.length() < 12){
-            if(!Pattern.matches(FrkConstants.passwordRegexUnder12, password)){
-                throw new PasswordRegexException("12자 미만의 경우 영문 대문자, 소문자, 숫자, 특수문자의 조합으로 입력해주세요.");
-            }
-            return true;
-        }
-        if(!Pattern.matches(FrkConstants.passwordRegex12orMore, password)){
-            throw new PasswordRegexException("12자 이상의 경우 영문 대/소문자, 숫자, 특수문자의 조합으로 입력해주세요.");
-        }
-        return true;
+
+        if(password.length() < 12 && Pattern.matches(FrkConstants.passwordRegexUnder12, password)) return true;
+        if(Pattern.matches(FrkConstants.passwordRegex12orMore, password)) return true;
+
+        throw new PasswordRegexException("12자 미만의 경우 영문 대문자, 소문자, 숫자, 특수문자의 조합으로, 12자 이상인 경우 영문, 숫자, 특수문자의 조합으로 입력해주세요.");
     }
 
     public PublicUserInfoRes getPublicUser(int id){

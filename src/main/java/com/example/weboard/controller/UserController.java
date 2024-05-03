@@ -2,7 +2,6 @@ package com.example.weboard.controller;
 
 import com.example.weboard.dto.ApiResponse;
 import com.example.weboard.dto.TokensDTO;
-import com.example.weboard.dto.UserDTO;
 import com.example.weboard.param.LoginParam;
 import com.example.weboard.param.SignupParam;
 import com.example.weboard.param.UpdateUserParam;
@@ -70,12 +69,13 @@ public class UserController extends BaseController{
 
     /**
      * 회원가입
+     *
      * @param signupParam 등록할 사용자의 데이터를 담은 DTO(userId, nickname, password)
      * @return user 등록된 유저 정보
      */
     @Operation(summary = "회원가입(새로운 사용자 등록)", description = "새로운 사용자를 등록합니다.")
     @PostMapping("/public/signup")
-    public ResponseEntity<ApiResponse<UserDTO>> insertUser(
+    public ResponseEntity<ApiResponse<String>> insertUser(
             @RequestBody @Valid SignupParam signupParam) throws Exception {
         return ok(userService.insertUser(signupParam));
     }
@@ -95,6 +95,7 @@ public class UserController extends BaseController{
 
     /**
      * 개인정보 수정, 액세스 토큰을 통해 인증된 사용자의 개인정보 수정 요청 처리
+     *
      * @param id
      * @param updateUserParam [nickname, password], 둘 다 nullable
      * @return
@@ -102,7 +103,7 @@ public class UserController extends BaseController{
      */
     @Operation(summary = "개인정보 수정", description = "개인정보(nickname 또는 password)를 수정할 수 있습니다.")
     @PutMapping("/my-info")
-    public ResponseEntity<ApiResponse<UserDTO>> updateUser(
+    public ResponseEntity<ApiResponse<String>> updateUser(
             @RequestAttribute("reqId") int id,
             @RequestBody @Valid UpdateUserParam updateUserParam) throws Exception {
         return ok(userService.updateUser(updateUserParam, id));

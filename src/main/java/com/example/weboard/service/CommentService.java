@@ -9,7 +9,6 @@ import com.example.weboard.response.CommentRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,12 +37,13 @@ public class CommentService {
     /**
      * 새로운 댓글을 추가합니다.
      * JWT 토큰에서 사용자 ID를 추출하고, 댓글에 게시물 ID와 사용자 ID를 설정한 후 데이터베이스에 삽입합니다.
+     *
      * @param insertCommentParam 삽입할 댓글 데이터
-     * @param postId 댓글이 속할 게시물의 ID
-     * @param jwttoken 요청자의 JWT 토큰
+     * @param postId             댓글이 속할 게시물의 ID
+     * @param jwttoken           요청자의 JWT 토큰
      * @return 데이터베이스에 삽입된 댓글 객체
      */
-    public CommentDTO insertComment(InsertCommentParam insertCommentParam, int postId, int id){
+    public String insertComment(InsertCommentParam insertCommentParam, int postId, int id){
 
         CommentDTO comment = new CommentDTO();
         comment.setCommentText(insertCommentParam.getCommentText());
@@ -51,17 +51,18 @@ public class CommentService {
         comment.setUserId(id);
 
         commentMapper.insert(comment);
-        return comment;
+        return comment.commentText;
     }
 
     /**
      * 기존의 댓글을 업데이트합니다.
      * 댓글 ID를 설정하고, 수정된 내용을 데이터베이스에 업데이트합니다.
+     *
      * @param updateCommentParam 업데이트할 댓글 데이터
-     * @param commentId 업데이트될 댓글의 ID
+     * @param commentId          업데이트될 댓글의 ID
      * @return 데이터베이스에 업데이트된 댓글 객체
      */
-    public CommentDTO updateComment(UpdateCommentParam updateCommentParam, int commentId, int id) throws UnauthorizedAccessException {
+    public String updateComment(UpdateCommentParam updateCommentParam, int commentId, int id) throws UnauthorizedAccessException {
 
         if(getCommentByCommentId(commentId).getCreatedBy() != id){ // 본인이 쓴 댓글이 아닐 경우
             throw new UnauthorizedAccessException("타인의 댓글을 수정할 수 없습니다.");
@@ -77,7 +78,7 @@ public class CommentService {
         comment.setUpdatedBy(id);
 
         commentMapper.update(comment);
-        return comment;
+        return comment.commentText;
     }
 
     /**

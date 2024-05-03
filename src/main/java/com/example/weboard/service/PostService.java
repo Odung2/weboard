@@ -58,11 +58,12 @@ public class PostService {
     /**
      * 새로운 게시물을 추가합니다.
      * JWT 토큰에서 사용자 ID를 추출하여 게시물의 생성자로 설정한 후 데이터베이스에 삽입합니다.
+     *
      * @param insertPostParam 삽입할 게시물 데이터
-     * @param id 요청자의 id
+     * @param id              요청자의 id
      * @return 데이터베이스에 삽입된 게시물 객체
      */
-    public PostDTO insertPost(InsertPostParam insertPostParam, int id){
+    public String insertPost(InsertPostParam insertPostParam, int id){
 
         PostDTO post = new PostDTO();
         post.setTitle(insertPostParam.getTitle());
@@ -71,18 +72,19 @@ public class PostService {
         post.setCreatedBy(id);
 
         postMapper.insert(post);
-        return post;
+        return post.getTitle();
     }
 
     /**
      * 주어진 ID의 게시물을 업데이트합니다.
      * JWT 토큰에서 사용자 ID를 추출하여 게시물의 수정자로 설정한 후 데이터베이스에 업데이트합니다.
+     *
      * @param updatePostParam 업데이트할 게시물 데이터
-     * @param postId 업데이트할 게시물의 ID
-     * @param jwttoken 요청자의 JWT 토큰
+     * @param postId          업데이트할 게시물의 ID
+     * @param jwttoken        요청자의 JWT 토큰
      * @return 데이터베이스에 업데이트된 게시물 객체
      */
-    public PostDTO updatePost(UpdatePostParam updatePostParam, int postId, int id) throws UnauthorizedAccessException {
+    public String updatePost(UpdatePostParam updatePostParam, int postId, int id) throws UnauthorizedAccessException {
 
         if(getPostById(postId).getCreatedBy() != id){
             throw new UnauthorizedAccessException("타인의 게시물을 수정할 수 없습니다.");
@@ -97,7 +99,7 @@ public class PostService {
         post.setUpdatedBy(id);
 
         postMapper.update(post);
-        return post;
+        return post.getTitle();
     }
 
     /**

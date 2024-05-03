@@ -1,7 +1,6 @@
 package com.example.weboard.controller;
 
 import com.example.weboard.dto.ApiResponse;
-import com.example.weboard.dto.FrkConstants;
 import com.example.weboard.dto.PostDTO;
 import com.example.weboard.dto.PostViewBO;
 import com.example.weboard.exception.UnauthorizedAccessException;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
 @RequestMapping("weboard/posts")
@@ -57,12 +55,12 @@ public class PostController extends BaseController{
      * 새로운 게시물을 추가합니다.
      *
      * @param insertPostParam 추가할 게시물 데이터
-     * @param jwttoken 인증 토큰
+     * @param jwttoken        인증 토큰
      * @return 추가된 게시물과 상태 메시지를 담은 ResponseEntity
      */
     @Operation(summary = "새로운 게시물을 추가합니다.")
     @PostMapping
-    public ResponseEntity<ApiResponse<PostDTO>> insertPost(
+    public ResponseEntity<ApiResponse<String>> insertPost(
             @RequestAttribute("reqId") int id,
             @RequestBody @Valid InsertPostParam insertPostParam) {
         return ok(postService.insertPost(insertPostParam, id));
@@ -71,14 +69,14 @@ public class PostController extends BaseController{
     /**
      * 유저가 작성한 본인의 게시물을 업데이트(수정)합니다.
      *
-     * @param jwttoken 인증 토큰
-     * @param postId 업데이트할 게시물의 ID
+     * @param jwttoken        인증 토큰
+     * @param postId          업데이트할 게시물의 ID
      * @param updatePostParam 업데이트할 게시물 데이터
      * @return 업데이트된 게시물과 상태 메시지를 담은 ResponseEntity
      */
     @Operation(summary = "유저가 작성한 본인의 게시물을 업데이트(수정)합니다.")
     @PutMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostDTO>> updatePost(
+    public ResponseEntity<ApiResponse<String>> updatePost(
             @RequestAttribute("reqId") int id,
             @PathVariable int postId,
             @RequestBody @Valid UpdatePostParam updatePostParam) throws UnauthorizedAccessException {
