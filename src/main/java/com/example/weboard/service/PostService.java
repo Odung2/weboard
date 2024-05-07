@@ -12,6 +12,7 @@ import com.example.weboard.response.PublicPostRes;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -117,8 +118,11 @@ public class PostService {
      * @throws BadRequestException 게시물의 생성자가 아닌 경우 예외를 던집니다.
      */
     public int deletePost(int postId, int id) throws BadRequestException, UnauthorizedAccessException {
-
-        if(getPostById(postId).getCreatedBy() != id){
+        PostDTO post = getPostById(postId);
+        if(post==null){
+            throw new NotFoundException("해당 게시글이 존재하지 않습니다.");
+        }
+        if(post.getCreatedBy() != id){
             throw new UnauthorizedAccessException("타인의 게시물을 수정할 수 없습니다.");
         }
 

@@ -8,6 +8,7 @@ import com.example.weboard.param.UpdateCommentParam;
 import com.example.weboard.response.CommentRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -88,10 +89,9 @@ public class CommentService {
      * @return 삭제 결과 (성공 시 1, 실패 시 0)
      */
     public int deleteComment(int commentId, int id) throws UnauthorizedAccessException {
-
-        if(getCommentByCommentId(commentId).getCreatedBy() != id){ // 본인이 쓴 댓글이 아닐 경우
-            throw new UnauthorizedAccessException("타인의 댓글을 삭제할 수 없습니다.");
-        }
+        CommentDTO comment = getCommentByCommentId(commentId);
+        if(comment==null) throw new NotFoundException("해당 댓글이 존재하지 않습니다.");
+        if(comment.getCreatedBy() != id) throw new UnauthorizedAccessException("타인의 댓글을 삭제할 수 없습니다.");
 
         return commentMapper.delete(commentId);
     }
