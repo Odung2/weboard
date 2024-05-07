@@ -182,7 +182,7 @@ public class UserService {
         if(password.length() < 12 && Pattern.matches(FrkConstants.passwordRegexUnder12, password)) return true;
         if(Pattern.matches(FrkConstants.passwordRegex12orMore, password)) return true;
 
-        throw new PasswordRegexException("12자 미만의 경우 영문 대문자, 소문자, 숫자, 특수문자의 조합으로, 12자 이상인 경우 영문, 숫자, 특수문자의 조합으로 입력해주세요.");
+        throw new PasswordRegexException("비밀번호는 12자 미만의 경우 영문 대문자, 소문자, 숫자, 특수문자의 조합으로, 12자 이상인 경우 영문, 숫자, 특수문자의 조합으로 입력해주세요.");
     }
 
     public PublicUserInfoRes getPublicUser(int id){

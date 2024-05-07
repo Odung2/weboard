@@ -23,7 +23,7 @@
                  </if>
     </select>
 
-    <select id="getPublicPostIntroAllByOffset" parameterType="int" resultType="PostDTO">
+    <select id="getPublicPostIntroAllByOffset" parameterType="int" resultType="PublicPostRes">
         SELECT post.post_id, post.title, post.views, post.created_at, user.nickname
         FROM post LEFT JOIN user ON post.created_by = user.id
         LIMIT #{pagesize}

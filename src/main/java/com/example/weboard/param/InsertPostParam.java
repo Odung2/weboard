@@ -26,6 +26,6 @@ public class InsertPostParam {
     @Nullable
     @Schema(description = "파일 데이터")
     @Size( max=500, message = "파일 데이터 경로는 1자 이상 500자 이하만 가능합니다.")
-    private byte[] fileData;
+    private String fileData;
 }
 

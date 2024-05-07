@@ -29,12 +29,12 @@ public class PostService {
      * @param basePagingParam 시작할 위치의 오프셋
      * @return 오프셋 기준으로 조회된 게시물 목록
      */
-    public List<PostDTO> getPostAllByOffset(BasePagingParam basePagingParam) {
-        return postMapper.getPostAllByOffset((int) basePagingParam.getCurrPage(), (int) basePagingParam.getPageSize());
-    }
+//    public List<PostDTO> getPostAllByOffset(BasePagingParam basePagingParam) {
+//        return postMapper.getPostAllByOffset((int) basePagingParam.getCurrPage(), (int) basePagingParam.getPageSize());
+//    }
 
     public List<PublicPostRes> getPublicPostIntroAllByOffset(BasePagingParam basePagingParam) {
-        return postMapper.getPublicPostIntroAllByOffset((int) basePagingParam.getCurrPage(), (int) basePagingParam.getPageSize());
+        return postMapper.getPublicPostIntroAllByOffset((int) basePagingParam.getOffset(), (int) basePagingParam.getPageSize());
     }
 
 

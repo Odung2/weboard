@@ -7,29 +7,20 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.apache.coyote.BadRequestException;
-import org.apache.ibatis.javassist.NotFoundException;
 import org.springdoc.api.ErrorMessage;
-import org.springframework.aop.framework.AopConfigException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.security.auth.login.CredentialException;
 import java.security.SignatureException;
-import java.util.logging.Logger;
-import java.util.logging.LoggingPermission;
 
 @RequiredArgsConstructor
 @RestControllerAdvice
@@ -55,13 +46,18 @@ public class GlobalExceptionHandler extends BaseController {
     public ResponseEntity<ApiResponse<Object>> handleMalformedJwtException (MalformedJwtException e){
 //        ApiResponse apiResponse = new ApiResponse(400, "토큰의 형식이 올바르지 않습니다", null);
 //        return ResponseEntity.status(400).body(apiResponse);
-        return nok(400, e.getMessage(), null);
+        return nok(401, e.getMessage(), null);
     }
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ApiResponse<Object>> handleJwtException(JwtException e){
 //        ApiResponse apiResponse = new ApiResponse(500, "토큰 처리 중 문제가 생겼습니다", null);
 //        return ResponseEntity.status(500).body(apiResponse);
         return nok(400, "토큰 처리 중 문제가 생겼습니다.", null);
+    }
+
+    @ExceptionHandler(io.jsonwebtoken.security.SignatureException.class)
+    public ResponseEntity<ApiResponse<Object>> handleSignatureException(io.jsonwebtoken.security.SignatureException e){
+        return nok(401, "검증되지 않은 토큰입니다.", null);
     }
 
     @ExceptionHandler(BadRequestException.class)

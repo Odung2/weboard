@@ -32,7 +32,7 @@ public class PostDTO extends BaseDTO{
     private String contents;
 
     @Schema(description = "파일 데이터")
-    private byte[] fileData;
+    private String fileData;
 
 
 }

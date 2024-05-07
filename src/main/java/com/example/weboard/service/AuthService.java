@@ -7,6 +7,7 @@ import com.example.weboard.exception.*;
 import com.example.weboard.param.LoginParam;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -226,6 +227,12 @@ public class AuthService {
             extractJWTClaims(jwt);
         } catch (ExpiredJwtException e) {
             throw new ExpiredJwtException(e.getHeader(), e.getClaims(), errorMessage);
+        } catch ( MalformedJwtException e){
+            throw new MalformedJwtException("토큰 형식이 올바르지 않습니다.");
+        } catch (SignatureException e) {
+            throw new SignatureException(e.getMessage());
+        } catch (ClaimJwtException e){
+            throw new JwtException("Jwt 권한 claim 검사를 실패했습니다.");
         }
     }
 
