@@ -1,6 +1,6 @@
 package com.example.weboard.exception;
 
-public class UnauthorizedAccessException extends Exception{
+public class UnauthorizedAccessException extends RuntimeException{
 
     public UnauthorizedAccessException(){}
 

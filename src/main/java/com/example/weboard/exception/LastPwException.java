@@ -1,6 +1,6 @@
 package com.example.weboard.exception;
 
-public class LastPwException extends Exception{
+public class LastPwException extends RuntimeException{
     public LastPwException(){}
 
     public LastPwException(String message){

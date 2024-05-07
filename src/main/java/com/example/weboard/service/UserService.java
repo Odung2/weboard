@@ -85,20 +85,24 @@ public class UserService {
      * @return 삽입된 사용자 정보
      * @throws Exception 비밀번호 검증 실패 시 예외 발생
      */
-    public String insertUser(SignupParam signupParam) throws Exception {
+    public String insertUser(SignupParam signupParam) throws NoSuchAlgorithmException {
         String plainPassword = signupParam.getPassword();
         checkNewPwValid(plainPassword);
         String sha256Password = plainToSha256(plainPassword);
 
-        if(getUser(signupParam.getUserId())!=null) throw new DuplicateKeyException("중복된 아이디입니다. 다른 아이디를 입력해주세요.");
+        try {
+            getUser(signupParam.getUserId());
+        } catch (NotFoundException e) {
+            UserDTO user = new UserDTO();
+            user.setUserId(signupParam.getUserId());
+            user.setNickname(signupParam.getNickname());
+            user.setPassword(sha256Password);
 
-        UserDTO user = new UserDTO();
-        user.setUserId(signupParam.getUserId());
-        user.setNickname(signupParam.getNickname());
-        user.setPassword(sha256Password);
+            userMapper.insert(user);
+            return user.getNickname();
+        }
+            throw new DuplicateKeyException("중복된 아이디입니다. 다른 아이디를 입력해주세요.");
 
-        userMapper.insert(user);
-        return user.getNickname();
     }
 
     /**
@@ -108,7 +112,7 @@ public class UserService {
      * @param id              사용자 ID
      * @return 업데이트된 사용자 정보
      */
-    public String updateUser(UpdateUserParam updateUserParam, int id) throws Exception {
+    public String updateUser(UpdateUserParam updateUserParam, int id) throws NoSuchAlgorithmException {
         getUser(id);
 
         String plainPassword = updateUserParam.getPassword();
@@ -126,7 +130,7 @@ public class UserService {
         user.setPassword(sha256Password);
         user.setUpdatedAt(LocalDateTime.now()); // 상속받은 필드는 builder 패턴 사용이 어려움...
         //FIXME auditListener로 고쳐야 함
-        user.setUpdatedBy(id);
+//        user.setUpdatedBy(id);
 
         userMapper.update(user);
         return user.getNickname();
@@ -173,7 +177,7 @@ public class UserService {
      * @return 검사 결과
      * @throws Exception 비밀번호 길이 또는 형식 불일치로 인한 예외 발생
      */
-    public boolean checkNewPwValid(String password) throws Exception{
+    public boolean checkNewPwValid(String password) {
 
         if(password.length() < 12 && Pattern.matches(FrkConstants.passwordRegexUnder12, password)) return true;
         if(Pattern.matches(FrkConstants.passwordRegex12orMore, password)) return true;

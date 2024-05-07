@@ -1,12 +1,12 @@
 package com.example.weboard.controller;
 
 import com.example.weboard.dto.ApiResponse;
-import com.example.weboard.dto.PostDTO;
 import com.example.weboard.dto.PostViewBO;
 import com.example.weboard.exception.UnauthorizedAccessException;
 import com.example.weboard.param.BasePagingParam;
 import com.example.weboard.param.InsertPostParam;
 import com.example.weboard.param.UpdatePostParam;
+import com.example.weboard.response.PublicPostRes;
 import com.example.weboard.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +33,9 @@ public class PostController extends BaseController{
      */
     @Operation(summary = "모든 게시물을 오프셋 기준으로 n개씩 반환합니다.")
     @PostMapping("/public")
-    public ResponseEntity<ApiResponse<List<PostDTO>>> getPostAllByOffset(
+    public ResponseEntity<ApiResponse<List<PublicPostRes>>> getPostAllByOffset(
             @RequestBody @Valid BasePagingParam basePagingParam) {
-        return ok(postService.getPostAllByOffset(basePagingParam));
+        return ok(postService.getPublicPostIntroAllByOffset(basePagingParam));
     }
 
     /**

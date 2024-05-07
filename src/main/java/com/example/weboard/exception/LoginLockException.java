@@ -1,6 +1,6 @@
 package com.example.weboard.exception;
 
-public class LoginLockException extends Exception{
+public class LoginLockException extends RuntimeException{
     public LoginLockException(){}
 
     public LoginLockException(String message){

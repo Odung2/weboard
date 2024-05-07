@@ -1,6 +1,6 @@
 package com.example.weboard.exception;
 
-public class ShortPasswordException extends Exception{
+public class ShortPasswordException extends RuntimeException{
     public ShortPasswordException(){}
 
     public ShortPasswordException(String message){

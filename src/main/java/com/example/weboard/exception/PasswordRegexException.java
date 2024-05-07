@@ -1,7 +1,7 @@
 package com.example.weboard.exception;
 
 
-public class PasswordRegexException extends Exception{
+public class PasswordRegexException extends RuntimeException{
 
     public PasswordRegexException(){}
 

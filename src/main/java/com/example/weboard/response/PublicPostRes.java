@@ -20,11 +20,11 @@ public class PublicPostRes {
     @Schema(description = "만든 일시")
     private LocalDateTime createdAt;
 
-    public PublicPostRes(PostDTO post, String nickname){
-        this.postId = post.getPostId();
-        this.title = post.getTitle();
-        this.nickname = nickname;
-        this.views = post.getViews();
-        this.createdAt = post.getCreatedAt();
-    }
+//    public PublicPostRes(PostDTO post, String nickname){
+//        this.postId = post.getPostId();
+//        this.title = post.getTitle();
+//        this.nickname = nickname;
+//        this.views = post.getViews();
+//        this.createdAt = post.getCreatedAt();
+//    }
 }

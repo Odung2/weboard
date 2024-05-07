@@ -1,6 +1,6 @@
 package com.example.weboard.exception;
 
-public class TokenNotIssueException extends Exception{
+public class TokenNotIssueException extends RuntimeException{
 
     public TokenNotIssueException(){}
 

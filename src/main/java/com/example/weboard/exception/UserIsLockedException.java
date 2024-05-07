@@ -1,6 +1,6 @@
 package com.example.weboard.exception;
 
-public class UserIsLockedException extends Exception{
+public class UserIsLockedException extends RuntimeException{
 
     public UserIsLockedException(){}
 

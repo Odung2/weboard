@@ -1,6 +1,6 @@
 package com.example.weboard.exception;
 
-public class LastLoginException extends Exception{
+public class LastLoginException extends RuntimeException{
     public LastLoginException(){}
 
     public LastLoginException(String message){

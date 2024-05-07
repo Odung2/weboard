@@ -8,6 +8,7 @@ import com.example.weboard.param.BasePagingParam;
 import com.example.weboard.param.InsertPostParam;
 import com.example.weboard.param.UpdatePostParam;
 import com.example.weboard.response.DetailPostRes;
+import com.example.weboard.response.PublicPostRes;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,11 @@ public class PostService {
     public List<PostDTO> getPostAllByOffset(BasePagingParam basePagingParam) {
         return postMapper.getPostAllByOffset((int) basePagingParam.getCurrPage(), (int) basePagingParam.getPageSize());
     }
+
+    public List<PublicPostRes> getPublicPostIntroAllByOffset(BasePagingParam basePagingParam) {
+        return postMapper.getPublicPostIntroAllByOffset((int) basePagingParam.getCurrPage(), (int) basePagingParam.getPageSize());
+    }
+
 
     /**
      * 주어진 아이디에 해당하는 게시글의 상세 정보를 조회합니다.

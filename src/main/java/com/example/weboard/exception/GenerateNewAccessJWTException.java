@@ -1,6 +1,6 @@
 package com.example.weboard.exception;
 
-public class GenerateNewAccessJWTException extends Exception{
+public class GenerateNewAccessJWTException extends RuntimeException{
     public GenerateNewAccessJWTException(){}
 
     public GenerateNewAccessJWTException(String message){
