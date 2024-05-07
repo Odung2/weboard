@@ -1,24 +1,13 @@
 package com.example.weboard.dto;
 
-import com.example.weboard.audit.UpdateEntityListener;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -26,9 +15,9 @@ import java.util.Date;
 //@SuperBuilder
 //@AllArgsConstructor
 //@SuperBuilder(builderMethodName = "updateUser")
-@Entity
+//@Entity
 //@EntityListeners(AuditingEntityListener.class)
-@EntityListeners(UpdateEntityListener.class)
+//@EntityListeners(UpdateEntityListener.class)
 @Schema(description = "사용자 정보를 나타내는 DTO")
 public class UserDTO extends BaseDTO{
 

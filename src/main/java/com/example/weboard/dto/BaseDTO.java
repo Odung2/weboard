@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 //@SuperBuilder
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+//@EntityListeners(AuditingEntityListener.class)
 public class BaseDTO {
 
     @Schema(description = "작성자 ID")

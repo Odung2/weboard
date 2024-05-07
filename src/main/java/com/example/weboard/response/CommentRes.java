@@ -7,6 +7,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 @Data
 public class CommentRes {
+    @Schema(description = "댓글 ID")
+    public int commentId;
     @Schema(description = "게시물 ID")
     public int postId;
     @Schema(description = "사용자 닉네임")

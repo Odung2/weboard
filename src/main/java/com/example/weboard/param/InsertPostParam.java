@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class InsertPostParam {
 
     @NotBlank(message = "제목을 작성해주세요.")
-    @Size(min = 1, max=30, message = "제목은 1자 이상 30자 이하만 가능합니다.")
+    @Size(min = 1, max=50, message = "제목은 1자 이상 50자 이하만 가능합니다.")
     @Schema(description = "제목")
     private String title;
 

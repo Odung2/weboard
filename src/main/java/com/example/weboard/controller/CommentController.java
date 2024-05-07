@@ -21,18 +21,18 @@ public class CommentController extends BaseController{
 
     private final CommentService commentService;
 
-    /**
-     * 특정 게시물의 댓글을 조회합니다.
-     *
-     * @param postId 댓글을 검색할 게시물의 ID
-     * @return CommentDTO 리스트와 상태 메시지를 포함하는 ResponseEntity를 반환합니다.
-     */
-    @Operation(summary = "특정 게시물의 댓글을 조회합니다.")
-    @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<List<CommentRes>>> getCommentByPostId(
-            @PathVariable int postId){
-        return ok(commentService.getCommentRes(postId));
-    }
+//    /**
+//     * 특정 게시물의 댓글을 조회합니다.
+//     *
+//     * @param postId 댓글을 검색할 게시물의 ID
+//     * @return CommentDTO 리스트와 상태 메시지를 포함하는 ResponseEntity를 반환합니다.
+//     */
+//    @Operation(summary = "특정 게시물의 댓글을 조회합니다.")
+//    @GetMapping("/{postId}")
+//    public ResponseEntity<ApiResponse<List<CommentRes>>> getCommentByPostId(
+//            @PathVariable int postId){
+//        return ok(commentService.getCommentRes(postId));
+//    }
 
     /**
      * 특정 게시물에 새 댓글을 추가합니다.
